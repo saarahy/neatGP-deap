@@ -19,7 +19,7 @@ def species(population, h):
                     ind.specie=ind1.get_specie()
                     break
             if ind.get_specie==None:
-                num_specie=count_species()
+                num_specie=count_species(population)
                 ind.specie=num_specie+1
 
 
