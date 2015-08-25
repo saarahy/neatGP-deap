@@ -145,6 +145,7 @@ class PrimitiveTree(list):
                 expr.append(Terminal(token, False, type_))
         return cls(expr)
 
+    #propiedades de la especiacion
     def specie(self,sp):
         self.tspecie=sp
 
