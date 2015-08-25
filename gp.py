@@ -146,6 +146,7 @@ class PrimitiveTree(list):
         return cls(expr)
 
     #propiedades de la especiacion
+    #cambio para neat
     def specie(self,sp):
         self.tspecie=sp
 

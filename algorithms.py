@@ -169,6 +169,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         offspring = varAnd(offspring, toolbox, cxpb, mutpb)
         
         # Evaluate the individuals with an invalid fitness
+        #cambio para test
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
