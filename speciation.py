@@ -5,22 +5,24 @@ def init_species(population):
         ind.specie(1)
 
 def count_species(population):
-    contador=0
+    specie=list()
+    specie.append(1)
     for ind in population:
-        if ind.get_specie!= None:
-            contador+=1
-    return contador
+        if ind.get_specie()!= None and specie[-1]!=ind.get_specie():
+            specie.append(ind.get_specie())
+    return len(specie)
 
 def species(population, h):
     for ind in population:
-        if ind.get_specie==None:
+        if ind.get_specie()==None:
             for ind1 in population:
                 if distance(ind,ind1)<=h:
-                    ind.specie=ind1.get_specie()
+                    ind.specie(ind1.get_specie())
                     break
-            if ind.get_specie==None:
+            if ind.get_specie()==None:
+                print 'en especies'
                 num_specie=count_species(population)
-                ind.specie=num_specie+1
+                ind.specie(num_specie+1)
     return population
 
 
