@@ -1,5 +1,6 @@
-from deap import base, creator, gp, tools
+from deap import base, creator, tools,gp
 from speciation import *
+
 import operator
 pset = gp.PrimitiveSet("MAIN", 1)
 pset.addPrimitive(operator.add, 2)
@@ -16,4 +17,6 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 expr = toolbox.individual()
 pop = toolbox.population(n=5)
-species(pop)
+for ind in pop:
+    print ind.get_specie()
+#species(pop)
