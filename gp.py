@@ -30,6 +30,7 @@ from functools import partial, wraps
 from inspect import isclass
 from operator import eq, lt
 
+from neat_gp import neat
 ######################################
 # GP Data structure                  #
 ######################################
@@ -147,11 +148,11 @@ class PrimitiveTree(list):
 
     #propiedades de la especiacion
     #cambio para neat
-    def specie(self,sp):
-        self.tspecie=sp
+    #def specie(self,sp):
+    #    self.tspecie=sp
 
-    def get_specie(self):
-        return self.tspecie
+    #def get_specie(self):
+    #   return self.tspecie
 
     @property
     def height(self):
@@ -183,7 +184,6 @@ class PrimitiveTree(list):
             total += self[end].arity - 1
             end += 1
         return slice(begin, end)
-
 
 class Primitive(object):
     """Class that encapsulates a primitive and when called with arguments it

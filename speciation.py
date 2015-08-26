@@ -21,5 +21,6 @@ def species(population, h):
             if ind.get_specie==None:
                 num_specie=count_species(population)
                 ind.specie=num_specie+1
+    return population
 
 
