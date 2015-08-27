@@ -33,7 +33,10 @@ def compare_tree(ind1, ind2):
 
 def level_node(expr):
     nodes, edges, labels = gp.graph(expr)
+    #outfile = open('edges.txt', 'a')
     edge=sorted(edges)
+    #outfile.write('\n edges expre %s %s ' % (edge,expr))
+    #outfile.close()
     contador=1
     nod=0
     level=list()

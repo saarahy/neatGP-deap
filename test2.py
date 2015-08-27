@@ -25,7 +25,6 @@ pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safeDiv, 2)
 pset.addPrimitive(math.cos, 1)
 pset.addPrimitive(math.sin, 1)
-pset.addEphemeralConstant("rand101", lambda: random.randint(-1,1))
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -73,11 +72,11 @@ def main():
     pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,
                                    halloffame=hof, verbose=True)
 
+    outfile = open('texto.txt', 'w') # Indicamos el valor 'w'.
 
-
-    print("Best individual is: ", str(hof[0]), hof[0].fitness, hof[0].fitness_test)
-    print("Best individual is: ", str(hof[1]), hof[1].fitness, hof[1].fitness_test)
-    print("Best individual is: ", str(hof[2]), hof[2].fitness, hof[2].fitness_test)
+    outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
 
     #for ind in pop:
         #print ind.fitness.values
@@ -85,17 +84,20 @@ def main():
     for ind in pop:
         ind.specie(1)
     #
-    print 'contando especies: ',count_species(pop)
+    outfile.write('\n contando especies: %s'% (count_species(pop)))
     pop+=toolbox.population(n=17)
     species(pop, 0.15)
-    print 'contando especies: ',count_species(pop)
+    outfile.write('\n contando especies: %s'% (count_species(pop)))
     # #print 'obteniendo especies despues de...'
-    # for ind in pop:
-    #     print ind, ind.get_specie()
-    print ind_specie(pop)
+    for ind in pop:
+         outfile.write('\n %s %s' %(ind, ind.get_specie()))
+
+    outfile.write('\n %s' % (ind_specie(pop)))
+    outfile.close()
+    print 'fin'
     #
-    # for ind in pop:
-    #     print ind.fitness.values
+    #for ind in pop:
+     #   print ind.fitness.values
     # print log
     return pop, log, hof
 
