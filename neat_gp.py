@@ -15,3 +15,10 @@ class neat:
 
     def get_descendents(self):
         return self.descendent
+
+    def penalty(self, p):
+        self.penalizado=p
+
+class pop_param:
+    def save_ind(self):
+        return True

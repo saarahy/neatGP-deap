@@ -71,6 +71,10 @@ def main():
   
     pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,
                                    halloffame=hof, verbose=True)
+
+    for ind in pop:
+        print ind.fitness.values
+
     print("Best individual is: ", str(hof[0]), hof[0].fitness, hof[0].fitness_test)
     print("Best individual is: ", str(hof[1]), hof[1].fitness, hof[1].fitness_test)
     print("Best individual is: ", str(hof[2]), hof[2].fitness, hof[2].fitness_test)
