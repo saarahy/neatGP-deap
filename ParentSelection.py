@@ -9,8 +9,11 @@ class p_selection():
         for ind in q:
             print 'eliminar individuos'
     #ordenar individuos basados en penalizacion
-    def num_desc(self, ind, avg):
-        print 'num de descendientes de cada individuo'
 
-    def avg(self, population):
-        print 'promedio de fitness de la poblacion'
+
+def num_desc(self, ind, avg):
+    print 'num de descendientes de cada individuo'
+
+
+def avg(self, population):
+    print 'promedio de fitness de la poblacion'
