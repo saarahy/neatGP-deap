@@ -1,5 +1,10 @@
+from speciation import *
 # tenemos que enviar una lista de parametros
 #determinados, de algun punto de la iniciacion
+def print_fit(population):
+    for ind in population:
+        print ind.fitness.values
+
 def SpeciesPunishment(population,params):
     salvar=params[0] #params.DontPenaliza
     penalizar=params[1] #param.penalization_method
@@ -13,12 +18,73 @@ def SpeciesPunishment(population,params):
                 ind.penalty(True)
             else:
                 if penalizar==1:
-                    ind.fitness(ind.fitness)
+                    ind.fitness_sharing(ind.fitness.values)
                 if penalizar==2:
-                     adj_fit=ind.fitness_sin_penalizar*ind.get_specie()
-                     ind.fitness(adj_fit)
+                    adj_fit=ind.fitness.values * int(ind.get_numspecie())
+                    ind.fitness_sharing(adj_fit)
             ind.penalty(True)
         elif protect=='no':
-            ind.fitness(ind.fitness)
+            ind.fitness_sharing(ind.fitness.values)
             ind.penalty(True)
 
+    #Habra que revisar si se puede optimizar este proceso
+    if salvar=='best_specie':
+        id_mejor=0
+        fitness_mejor=9999999999
+        nodos_mejor=9999999999
+        level_mejor=9999999999
+
+        for ind, i in population, range(population):
+            if ind.fitness.values<fitness_mejor:
+                id_mejor=i
+                fitness_mejor=ind.fitness.values
+                nodos_mejor=len(ind)
+                level_mejor=ind.height
+            elif ind.fitness.values==fitness_mejor:
+                if len(ind)<nodos_mejor:
+                    id_mejor=i
+                    fitness_mejor=ind.fitness.values
+                    nodos_mejor=len(ind)
+                    level_mejor=ind.height
+                elif len(ind)==nodos_mejor:
+                    if ind.height<level_mejor:
+                        id_mejor=i
+                        fitness_mejor=ind.fitness.values
+                        nodos_mejor=len(ind)
+                        level_mejor=ind.height
+
+        if id_mejor!=0 or id_mejor!=None:
+            population[id_mejor].fitness_sharing(population[id_mejor].fitness.values)
+    elif salvar=='best_of_each_specie':
+        #regresa la lista con la especie & cuantos elementos pertenecen en ella
+        specie=ind_specie(population)
+        id_mejor=0
+        fitness_mejor=9999999999
+        nodos_mejor=9999999999
+        level_mejor=9999999999
+        contador=0
+        for e in specie:
+            for ind, i in zip(population, range(len(population))):
+                if ind.get_specie()==e[0]:
+                    contador+=1
+                    if ind.fitness.values<fitness_mejor:
+                        id_mejor=i
+                        fitness_mejor=ind.fitness.values
+                        nodos_mejor=len(ind)
+                        level_mejor=ind.height
+                    elif ind.fitness.values==fitness_mejor:
+                        if len(ind)<nodos_mejor:
+                            id_mejor=i
+                            fitness_mejor=ind.fitness.values
+                            nodos_mejor=len(ind)
+                            level_mejor=ind.height
+                        elif len(ind)==nodos_mejor:
+                            if ind.height<level_mejor:
+                                id_mejor=i
+                                fitness_mejor=ind.fitness.values
+                                nodos_mejor=len(ind)
+                                level_mejor=ind.height
+                if contador==e[1]:
+                    break
+            if id_mejor!=0 or id_mejor!=None:
+                population[id_mejor].fitness_sharing(population[id_mejor].fitness.values)

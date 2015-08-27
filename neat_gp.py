@@ -10,6 +10,9 @@ class neat:
     def fitness_sharing(self, avg):
         self.fitness_h=avg
 
+    def get_fsharing(self):
+        return self.fitness_h
+
     def descendents(self, des):
         self.descendent=des
 
@@ -18,6 +21,12 @@ class neat:
 
     def penalty(self, p):
         self.penalizado=p
+
+    def num_specie(self,ns):
+        self.nspecie=ns
+
+    def get_numspecie(self):
+        return self.nspecie
 
 class pop_param:
     def save_ind(self):

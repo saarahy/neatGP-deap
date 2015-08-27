@@ -9,11 +9,14 @@ def init_species(population):
 #de toda la poblacion
 def count_species(population):
     specie=list()
-    specie.append(1)
+    #specie.append(0)
     for ind in population:
         if ind.get_specie()!= None and ind.get_specie() not in specie:
             specie.append(ind.get_specie())
-    return len(specie)
+    if not specie:
+        return 0
+    else:
+        return len(specie)
 
 #funcion para contar los individuos de una especie
 def ind_specie(population):
@@ -25,8 +28,17 @@ def ind_specie(population):
     for i in range(len(specie)):
         if specie[i]!=specie[i-1]:
             num.append([specie[i],specie.count(specie[i])])
+    for ind in population:
+        set_numind(ind, num)
     return num
 
+#funcion para asignar el numero de individuos
+#en la especie, al individuo de esa misma especie
+
+def set_numind(ind,species):
+    for i in range(len(species)):
+        if species[i][0]==ind.get_specie() and ind.num_specie!=None:
+            ind.num_specie(species[i][1])
 
 #revisa si algun individuo de la poblacion
 #se encuentra sin especie y le asigna una
