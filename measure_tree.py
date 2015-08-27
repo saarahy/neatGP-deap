@@ -7,11 +7,15 @@ def distance(ind1, ind2):
     Nij=len(ind1)+len(ind2)
     Dij=(ind1.height+1)+(ind2.height+1)
     common_tree=compare_tree(ind1,ind2)
-    nsij=common_tree[0]
-    dsij=common_tree[1]
-    d1=b*((Nij-2*nsij)/(Nij-2))
-    d2=(1-b)*((Dij-2*dsij)/(Dij-2))
+    nsij=common_tree[0] #2
+    dsij=common_tree[1] #1
+    d1=b*((Nij-(2*nsij))/(Nij-2))
+    d2=(1-b)*((Dij-(2*dsij))/(Dij-2))
     d=d1+d2
+    #out=open('dis.txt', 'a')
+    #out.write('\n Nij, Dij, nsij, dsij, d1, d2, ind1, ind2 %s %s %s %s %s %s %s %s' %
+    #          (Nij, Dij, nsij, dsij, d1, d2, ind1, ind2))
+    #out.close()
     #ind=[ind for ind in population]
     #distance=len(ind)
     return d
@@ -28,12 +32,18 @@ def compare_tree(ind1, ind2):
             num_nodes=1+level1[i][2]
         elif(level1[i]==level2[i]):
             num_nodes+=level1[i][2]
-        tot_depth=level1[i][1]
+        tot_depth=level1[i+1][1]
+    #out=open('level.txt','a')
+    #out.write('\n level1 level 2 ind1 ind2 %s %s %s %s ' %(level1, level2, ind1, ind2))
+    #out.close()
     return num_nodes, tot_depth
 
 def level_node(expr):
     nodes, edges, labels = gp.graph(expr)
+    #outfile = open('edges.txt', 'a')
     edge=sorted(edges)
+    #outfile.write('\n edges expre %s %s ' % (edge,expr))
+    #outfile.close()
     contador=1
     nod=0
     level=list()

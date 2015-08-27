@@ -9,7 +9,7 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
-
+from fitness_sharing import *
 from speciation import *
 
 def safeDiv(left, right):
@@ -25,7 +25,6 @@ pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safeDiv, 2)
 pset.addPrimitive(math.cos, 1)
 pset.addPrimitive(math.sin, 1)
-pset.addEphemeralConstant("rand101", lambda: random.randint(-1,1))
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -58,7 +57,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=50)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -70,32 +69,49 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,
-                                   halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,halloffame=hof, verbose=True)
 
+    outfile = open('texto.txt', 'w')
 
+    outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
 
-    print("Best individual is: ", str(hof[0]), hof[0].fitness, hof[0].fitness_test)
-    print("Best individual is: ", str(hof[1]), hof[1].fitness, hof[1].fitness_test)
-    print("Best individual is: ", str(hof[2]), hof[2].fitness, hof[2].fitness_test)
+    species(pop, 0.15)
+    #for ind in pop:
+    #    print ind.get_specie()
+
+    outfile.write('\n contando especies: %s'% (count_species(pop)))
+
+    species(pop, 0.15)
+
+    outfile.write('\n contando especies: %s'% (count_species(pop)))
+
+    #species(pop, 0.15)
+    for ind in pop:
+         outfile.write('\n %s %s' %(ind, ind.get_specie()))
+    #asigna el numero total de especies en cada ind
+    #outfile.write('\n %s' % (ind_specie(pop)))
+
+    print ind_specie(pop)
+    outfile.close()
+
+    params=['best_of_each_specie',2,'yes']
 
     #for ind in pop:
-        #print ind.fitness.values
+    #    print ind.get_numspecie()
+    #print_fit(pop)
+    SpeciesPunishment(pop,params)
+    #for ind in pop:
+    #    print ind.get_fsharing()[0]
+    #outfile = open('fit.txt', 'w')
+    #for ind in pop:
+    #    outfile.write('\n fitness_sharing %s' %(ind.get_fsharing()))
+    #outfile.close()
 
-    for ind in pop:
-        ind.specie(1)
     #
-    print 'contando especies: ',count_species(pop)
-    pop+=toolbox.population(n=17)
-    species(pop, 0.15)
-    print 'contando especies: ',count_species(pop)
-    # #print 'obteniendo especies despues de...'
-    # for ind in pop:
-    #     print ind, ind.get_specie()
-    print ind_specie(pop)
-    #
-    # for ind in pop:
-    #     print ind.fitness.values
+    #for ind in pop:
+     #   print ind.fitness.values
     # print log
     return pop, log, hof
 
