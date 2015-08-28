@@ -11,7 +11,7 @@ from deap import tools
 from deap import gp
 from fitness_sharing import *
 from speciation import *
-
+from ParentSelection import *
 def safeDiv(left, right):
     try:
         return left / right
@@ -57,7 +57,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=500)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -69,7 +69,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 20, stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
@@ -98,21 +98,11 @@ def main():
 
     params=['best_of_each_specie',2,'yes']
 
-    #for ind in pop:
-    #    print ind.get_numspecie()
-    #print_fit(pop)
     SpeciesPunishment(pop,params)
-    #for ind in pop:
-    #    print ind.get_fsharing()[0]
-    #outfile = open('fit.txt', 'w')
-    #for ind in pop:
-    #    outfile.write('\n fitness_sharing %s' %(ind.get_fsharing()))
-    #outfile.close()
+    parents=p_selection(pop)
 
-    #
-    #for ind in pop:
-     #   print ind.fitness.values
-    # print log
+    for ind in parents:
+        print ind
     return pop, log, hof
 
 

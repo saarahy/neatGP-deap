@@ -1,9 +1,10 @@
 from deap import gp
+import numpy as np
 from speciation import *
-class p_selection():
-    #debe de recibir de entrada el parametro de
+#debe de recibir de entrada el parametro de
     #survival_thershold=0.5
-    def p_selection(self, population):
+
+def p_selection(population):
         #provisional
         survival=0.5
         #sacar promedio para penalizar
@@ -11,40 +12,54 @@ class p_selection():
         #penalizar al promedio
         if prom_ap_penal>10:
             prom_ap_penal=10
-        q=list()
+
+
         #conseguimos y aplicamos el num. de desc.
         # a cada individuo
         for ind in population:
-            ind.descendent(num_desc(ind, prom_ap_penal))
+            ind.descendents(num_desc(ind, prom_ap_penal))
 
-        numbest=round(len(population)*survival)
         q=population
 
-        #ordenar poblacion por su fitness
-        allpotfit=sort_fitness(q)
         #obtener numero de especies
-        specie=ind_specie(population)
+        specie=ind_specie(q)
+        #crear grupos auxilares
+        gpo_specie=list()
+        parents=list()
+        gparents=list()
+        contador=0
         for e in specie:
-            contador=0
-            for ind in population:
+            for ind in q:
                 if ind.get_specie()==e[0]:
                     contador+=1
-                    if round(ind.get_numspecie() * survival)<contador:
-                        ind.fitness.values=9999999
-                        if ind.get_numspecie==contador:
-                            break
+                    #print 'ind'
+                    gpo_specie.append(ind)
+                if contador==e[1]:
+                    #print 'hey'
+                    parents.append(eliminar_ind(gpo_specie,survival))
+                    gpo_specie=list()
+                    contador=0
+        for ind in parents:
+            if ind!=[]:
+                gparents.append(ind[0][0])
+        return gparents
 
 
 
-def num_desc(self, ind, avg):
-    numd=round(avg/ind.get_fsharing())
-    return numd
+
+def num_desc(ind, avg):
+    #print 'ind', ind
+    int1=list(ind.fitness.values)
+    int1=float(int1[0])
+    numd=round(avg/int1)
+    return int(numd)
 
 
-def avg(self, population):
+def avg(population):
     suma=0
     for ind in population:
-        suma+=ind.get_fsharing()
+        int1=list(ind.fitness.values)
+        suma+=int1[0]
     promedio=suma/len(population)
     return promedio
 
@@ -52,6 +67,19 @@ def sort_fitness(population):
     allpotfit=list()
     orderbyfit=list()
     for ind in population:
-        allpotfit.append([ind, ind.fitness.values, ind.get_fsharing])
-    orderbyfit=sorted(allpotfit, key=lambda ind: ind[1])
+        allpotfit.append([ind, ind.fitness.values, ind.get_fsharing()])
+    orderbyfit=sorted(allpotfit, key=lambda ind: ind[2])
+    #for ind in orderbyfit:
+        #print ind[0]
     return orderbyfit
+
+def eliminar_ind(gpo_specie, survival):
+    sort_gpo=sort_fitness(gpo_specie)
+    indice=int(round(len(sort_gpo)-(len(sort_gpo)*survival)))
+    reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[2],reverse=True)
+    for i in range(indice):
+       del reverse_gpo[0]
+    sort_gpo=sorted(reverse_gpo, key=lambda ind:ind[2])
+    #for ind in sort_gpo:
+        #print ind[0]
+    return sort_gpo
