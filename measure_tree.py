@@ -49,7 +49,7 @@ def level_node(expr):
     level=list()
     restart=True
     if len(expr)<2:
-        level.append([edge[0][0], contador, 0])
+        level.append([0, contador, 0])
     else:
         level.append([edge[0][0], contador, expr[0].arity])
     for i in range(max(nodes)):
