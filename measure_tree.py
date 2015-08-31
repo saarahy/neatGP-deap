@@ -12,30 +12,28 @@ def distance(ind1, ind2):
     d1=b*((Nij-(2*nsij))/(Nij-2))
     d2=(1-b)*((Dij-(2*dsij))/(Dij-2))
     d=d1+d2
-    #out=open('dis.txt', 'a')
-    #out.write('\n Nij, Dij, nsij, dsij, d1, d2, ind1, ind2 %s %s %s %s %s %s %s %s' %
-    #          (Nij, Dij, nsij, dsij, d1, d2, ind1, ind2))
-    #out.close()
-    #ind=[ind for ind in population]
-    #distance=len(ind)
     return d
 
 
 def compare_tree(ind1, ind2):
-    level1=level_node(ind1)
-    level2=level_node(ind2)
-    min_nodes=min(max(level1)[0], max(level2)[0])
-    num_nodes=0
-    tot_depth=0
-    for i in  range(min_nodes):
-        if(level1[0]==level2[0] and level1[i][0]==0):
-            num_nodes=1+level1[i][2]
-        elif(level1[i]==level2[i]):
-            num_nodes+=level1[i][2]
-        tot_depth=level1[i+1][1]
-    #out=open('level.txt','a')
-    #out.write('\n level1 level 2 ind1 ind2 %s %s %s %s ' %(level1, level2, ind1, ind2))
-    #out.close()
+    if len(ind1)<2 or len(ind2)<2:
+        num_nodes=1
+        tot_depth=1
+    else:
+        level1=level_node(ind1)
+        level2=level_node(ind2)
+        min_nodes=min(max(level1)[0], max(level2)[0])
+        num_nodes=0
+        tot_depth=0
+        for i in  range(min_nodes):
+            if(level1[0]==level2[0] and level1[i][0]==0):
+                num_nodes=1+level1[i][2]
+            elif(level1[i]==level2[i]):
+                num_nodes+=level1[i][2]
+            tot_depth=level1[i+1][1]
+        #out=open('level.txt','a')
+        #out.write('\n level1 level 2 ind1 ind2 %s %s %s %s ' %(level1, level2, ind1, ind2))
+        #out.close()
     return num_nodes, tot_depth
 
 def level_node(expr):
@@ -48,22 +46,22 @@ def level_node(expr):
     nod=0
     level=list()
     restart=True
+    #numnodo #numnivel #aridad
     if len(expr)<2:
         level.append([0, contador, 0])
     else:
         level.append([edge[0][0], contador, expr[0].arity])
-    for i in range(max(nodes)):
-        restart=True
-        contador=1
-        nod=i+1
-        while restart:
-            restart=False
-            for j in range(max(nodes)):
-                if edge[j][1]==nod:
-                    contador+=1
-                    nod=edge[j][0]
-                if(nod>0 and contador>1):
-                    restart=True
-        level.append([i+1, contador, expr[i+1].arity])
-
+        for i in range(max(nodes)):
+            restart=True
+            contador=1
+            nod=i+1
+            while restart:
+                restart=False
+                for j in range(max(nodes)):
+                    if edge[j][1]==nod:
+                        contador+=1
+                        nod=edge[j][0]
+                    if(nod>0 and contador>1):
+                        restart=True
+            level.append([i+1, contador, expr[i+1].arity])
     return level
