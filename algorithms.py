@@ -27,7 +27,8 @@ you really want them to do.
 
 import random
 from measure_tree import *
-import tools
+from neat_operators import *
+from speciation import *
 
 def varAnd(population, toolbox, cxpb, mutpb):
     """Part of an evolutionary algorithm applying only the variation part
@@ -79,7 +80,7 @@ def varAnd(population, toolbox, cxpb, mutpb):
     
     return offspring
 
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, h, params, stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -95,6 +96,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     :param halloffame: A :class:`~deap.tools.HallOfFame` object that will
                        contain the best individuals, optional.
     :param verbose: Whether or not to log the statistics.
+    :param neat: wheter or not to use neatGP
     :returns: The final population and a :class:`~deap.tools.Logbook`
               with the statistics of the evolution.
     
@@ -142,7 +144,15 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
+    if neat:
+        #realiza la especiacion de la poblacion, dado un parametro h
+        species(population,h)
+        #asigna a cada individuo de la poblacion, el numero de individuos
+        #dentro de su misma especie
+        ind_specie(population)
+
     # Evaluate the individuals with an invalid fitness
+    #fitness_test
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
@@ -150,10 +160,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         ind.fitness.values = fit
         ind.fitness_test.values = fit_test
 
+
+
     if halloffame is not None:
         halloffame.update(population)
 
-    print distance(population)
+
 
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
@@ -166,7 +178,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         offspring = toolbox.select(population, len(population))
         
         # Vary the pool of individuals
-        offspring = varAnd(offspring, toolbox, cxpb, mutpb)
+        #here will be evaluated the parents pool with
+        #the neat crossover algorithm
+        if neat:
+            offspring=neatGP(toolbox,parents,cxpb,mutpb)
+        else:
+            offspring = varAnd(offspring, toolbox, cxpb, mutpb)
         
         # Evaluate the individuals with an invalid fitness
         #cambio para test
@@ -180,7 +197,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
             halloffame.update(offspring)
-            
+
+        #Reemplazar unicamente los peores
+        #The best offspring in R replace the
+        #pworst% individual of the population
         # Replace the current population by the offspring
         population[:] = offspring
         

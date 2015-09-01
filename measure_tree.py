@@ -1,6 +1,7 @@
 from __future__ import division
 from deap import base, creator, gp, tools
 
+
 #determina la distancia entre un individuo y otro
 #ecuacion 2
 #regresa un numero

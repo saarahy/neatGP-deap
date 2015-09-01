@@ -9,9 +9,14 @@ def neatcx(ind1, ind2):
     for i in p1:
         if random.random()<0.5:
             #print 'cambio nodo'
-            l=random.choice(l2)
+            a=0
+            while(a<1):
+                l=random.choice(l2)
+                if l.arity==ind1[i].arity:
+                    ind1[i]=l
+                    a=2
             #p=random.choice(p2)
-            ind1[i]=l
+
             break
     #print 'ind mod node:',ind1
     for i in e1:
