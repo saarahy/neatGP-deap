@@ -12,22 +12,25 @@ from crosspoints import *
 def neatGP(toolbox,parents,cxpb,mutpb,n):
     R=list()
     i=0
-    while i<n:
+    while i<n and i<len(parents):
         eflag=random.random()
+
         if eflag:
             ind1=parents[0] #el mejor individuo debido su fitnes
+            #print 'eflag',ind1
         else:
             ind1=random.choice(parents)
         if random.random()<mutpb:
             offspring=toolbox.mutate(ind1)
             #del offspring.fitness.values
-            del offspring.specie
-            del offspring.fitness_sharing
-            del offspring.num_specie
+            # del offspring.specie
+            # del offspring.fitness_sharing
+            # del offspring.num_specie
             R.append(offspring)
-            ind1.descendents(offspring[i].get_descendents()-1)
+            ind1.descendents(ind1.get_descendents()-1)
             i+=1
         if random.random()<cxpb:
+            ind2=list()
             if ind1.get_numspecie()>1:
                 for q in parents:
                     if q!=ind1 and q.get_fsharing()>=ind1.get_fsharing():
@@ -41,10 +44,15 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             ind2.descendents(ind2.get_descendents()-0.5)
             i+=1
             if ind2.get_descendents()<=0:
-                print 'ayuda'
-                #del parents[ind2]
+                for i in range(len(parents)):
+                    if parents[i]==ind2:
+                        del parents[i]
+                        break
+        #print 'desc',ind1.get_descendents()
         if ind1.get_descendents()<=0:
-            print 'ayuda'
-            #del parents[ind1]
+            for i in range(len(parents)):
+                if parents[i]==ind1:
+                    del parents[i]
+                    break
     return R
 

@@ -95,14 +95,14 @@ def main():
     #asigna el numero total de especies en cada ind
     #outfile.write('\n %s' % (ind_specie(pop)))
 
-    print ind_specie(pop)
+    ind_specie(pop)
     outfile.close()
 
     SpeciesPunishment(pop,params)
     parents=p_selection(pop)
-    newp=neatGP(toolbox,parents,0.9,0.05,50)
-
-    #    print ind
+    newp=neatGP(toolbox,parents,0.9,0.05,len(parents))
+    for ind in newp:
+        print ind
     return pop, log, hof
         #gp.cxOnePointLeafBiased(ind,)
 if __name__ == "__main__":
