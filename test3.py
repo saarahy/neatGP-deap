@@ -26,3 +26,4 @@ print cxp
 #print distance(expr,expr2)
 
 print neatcx(expr, expr2)
+species(pop, 0.15)

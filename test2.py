@@ -12,6 +12,8 @@ from deap import gp
 from fitness_sharing import *
 from speciation import *
 from ParentSelection import *
+from neat_operators import *
+
 def safeDiv(left, right):
     try:
         return left / right
@@ -57,7 +59,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=50)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -68,8 +70,8 @@ def main():
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
-
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,halloffame=hof, verbose=True)
+    params=['best_of_each_specie',2,'yes']
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 20,False,0.15,params,0,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
@@ -96,10 +98,9 @@ def main():
     print ind_specie(pop)
     outfile.close()
 
-    params=['best_of_each_specie',2,'yes']
-
     SpeciesPunishment(pop,params)
     parents=p_selection(pop)
+    newp=neatGP(toolbox,parents,0.9,0.05,50)
 
     #    print ind
     return pop, log, hof
