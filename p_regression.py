@@ -70,7 +70,7 @@ def main():
     mstats.register("max", numpy.max)
   
     pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,
-                                   halloffame=hof, verbose=True)
+                                   halloffame=hof, verbose=True, neat=True)
 
     for ind in pop:
         print ind.fitness.values
