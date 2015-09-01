@@ -47,11 +47,15 @@ def species(population, h):
         if ind.get_specie()==None:
             for ind1 in population:
                 if distance(ind,ind1)<=h:
+                    #out= open('specie.txt', 'a')
+                    #out.write('\n ind1: %s \n ind2: %s \n distancia: %s' % (ind, ind1, distance(ind,ind1)))
+                    #out.close()
                     ind.specie(ind1.get_specie())
                     break
             if ind.get_specie()==None:
                 num_specie=count_species(population)
                 ind.specie(num_specie+1)
     return population
+
 
 

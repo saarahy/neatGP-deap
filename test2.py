@@ -57,7 +57,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -69,7 +69,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 20, stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
@@ -77,19 +77,19 @@ def main():
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
 
-    species(pop, 0.15)
+    #species(pop, 0.15)
     #for ind in pop:
     #    print ind.get_specie()
 
-    outfile.write('\n contando especies: %s'% (count_species(pop)))
-
+    #outfile.write('\n contando especies: %s'% (count_species(pop)))
+    print 'especies'
     species(pop, 0.15)
 
-    outfile.write('\n contando especies: %s'% (count_species(pop)))
+    #outfile.write('\n contando especies: %s'% (count_species(pop)))
 
     #species(pop, 0.15)
     for ind in pop:
-         outfile.write('\n %s %s' %(ind, ind.get_specie()))
+        outfile.write('\n %s %s' %(ind, ind.get_specie()))
     #asigna el numero total de especies en cada ind
     #outfile.write('\n %s' % (ind_specie(pop)))
 
@@ -101,10 +101,8 @@ def main():
     SpeciesPunishment(pop,params)
     parents=p_selection(pop)
 
-    for ind in parents:
-        print ind
+    #    print ind
     return pop, log, hof
-
-
+        #gp.cxOnePointLeafBiased(ind,)
 if __name__ == "__main__":
     main()
