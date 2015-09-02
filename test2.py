@@ -13,7 +13,7 @@ from fitness_sharing import *
 from speciation import *
 from ParentSelection import *
 from neat_operators import *
-
+from plist import *
 def safeDiv(left, right):
     try:
         return left / right
@@ -71,7 +71,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 20,False,0.15,params,0,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 20,False,0.15,params,0,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
@@ -95,14 +95,19 @@ def main():
     #asigna el numero total de especies en cada ind
     #outfile.write('\n %s' % (ind_specie(pop)))
 
-    print ind_specie(pop)
+    ind_specie(pop)
     outfile.close()
 
     SpeciesPunishment(pop,params)
     parents=p_selection(pop)
-    newp=neatGP(toolbox,parents,0.9,0.05,50)
+    for ind in parents:
+        print ind
 
-    #    print ind
+    print '--'
+    r=neatGP(toolbox,parents,0.7,0.3,len(parents))
+    for ind in r:
+        print ind
+
     return pop, log, hof
         #gp.cxOnePointLeafBiased(ind,)
 if __name__ == "__main__":
