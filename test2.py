@@ -71,7 +71,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 20,True,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
