@@ -9,18 +9,21 @@
 import random
 from neat_gp import *
 from crosspoints import *
-def neatGP(toolbox,parents,population,cxpb,mutpb,n):
+def neatGP(toolbox,parents,cxpb,mutpb,n):
     r=list()
     i=0
+    copy_parent=copy.deepcopy(parents)
+
     while i<n:
+        if n>len(parents):
+            lim=int(round(n/len(parents)))
+            for d in range(lim):
+                copy_parent+=parents
         eflag=int(round(random.random()))
-        if len(parents)>0:
-            if eflag:
-                ind1=parents[0] #el mejor individuo debido su fitnes
-            else:
-                ind1=random.choice(parents)
+        if eflag:
+            ind1=copy_parent[0] #el mejor individuo debido su fitnes
         else:
-                ind1=random.choice(population)
+            ind1=random.choice(copy_parent)
         if random.random()<mutpb:
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
@@ -29,12 +32,12 @@ def neatGP(toolbox,parents,population,cxpb,mutpb,n):
             i+=1
         if random.random()<cxpb:
             if ind1.get_numspecie()>1:
-                for q in parents:
+                for q in copy_parent:
                     if q.get_specie()==ind1.get_specie():
                         ind2=q
                         break
             else:
-                ind2=random.choice(parents)
+                ind2=random.choice(copy_parent)
             of1=copy.deepcopy(ind1)
             of2=copy.deepcopy(ind2)
             hijo=neatcx(of1,of2)
@@ -43,14 +46,14 @@ def neatGP(toolbox,parents,population,cxpb,mutpb,n):
             ind2.descendents(ind2.get_descendents()-0.5)
             i+=1
             if ind2.get_descendents()<=0:
-                for i in range(len(parents)):
-                    if parents[i] == ind2:
-                        del parents[i]
+                for i in range(len(copy_parent)):
+                    if copy_parent[i] == ind2:
+                        del copy_parent[i]
                         break
         if ind1.get_descendents()<=0:
-            for i in range(len(parents)):
-                if parents[i] == ind1:
-                    del parents[i]
+            for i in range(len(copy_parent)):
+                if copy_parent[i] == ind1:
+                    del copy_parent[i]
                     break
     return r
 
