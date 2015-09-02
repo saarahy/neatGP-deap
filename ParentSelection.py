@@ -13,7 +13,6 @@ def p_selection(population):
         if prom_ap_penal>10:
             prom_ap_penal=10
 
-
         #conseguimos y aplicamos el num. de desc.
         # a cada individuo
         for ind in population:
