@@ -9,6 +9,7 @@ def p_selection(population):
         survival=0.5
         #sacar promedio para penalizar
         prom_ap_penal=avg(population)
+        print 'promedio:',prom_ap_penal
         #penalizar al promedio
         if prom_ap_penal>10:
             prom_ap_penal=10
@@ -22,6 +23,7 @@ def p_selection(population):
 
         #obtener numero de especies
         specie=ind_specie(q)
+        print specie
         #crear grupos auxilares
         gpo_specie=list()
         parents=list()

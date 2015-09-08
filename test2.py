@@ -45,13 +45,16 @@ def evalSymbReg(individual, points):
     return math.fsum(sqerrors) / len(points),
 
 
-with open("exp_x.txt") as spambase:
+with open("test_x.txt") as spambase:
     spamReader = csv.reader(spambase)
     spam = [float(row[0]) for row in spamReader]
+with open("train_x.txt") as spamb:
+    spamReader2 = csv.reader(spamb)
+    spam2 = [float(row[0]) for row in spamReader2]
 #print spam
 #print [x/10. for x in range(-20,20)]
 
-toolbox.register("evaluate", evalSymbReg, points=spam)
+toolbox.register("evaluate", evalSymbReg, points=spam2)
 toolbox.register("evaluate_test", evalSymbReg, points=spam)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
@@ -71,7 +74,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 20,True,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 
