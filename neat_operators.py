@@ -15,16 +15,18 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
     copy_parent=copy.deepcopy(parents)
 
     while i<n:
-        if n>len(parents):
-            lim=int(round(n/len(parents)))
+        bandera=0
+        if n>len(copy_parent):
+            lim=int(round(n/len(copy_parent)))
             for d in range(lim):
-                copy_parent+=parents
+                copy_parent+=copy_parent
         eflag=int(round(random.random()))
         if eflag:
             ind1=copy_parent[0] #el mejor individuo debido su fitnes
         else:
             ind1=random.choice(copy_parent)
         if random.random()<mutpb:
+            bandera=1
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
             r.append(offspring[0])
@@ -44,16 +46,20 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             r.append(hijo)
             ind1.descendents(ind1.get_descendents()-0.5)
             ind2.descendents(ind2.get_descendents()-0.5)
-            i+=1
+            if bandera==0:
+                i+=1
+            bandera=1
             if ind2.get_descendents()<=0:
-                for i in range(len(copy_parent)):
-                    if copy_parent[i] == ind2:
-                        del copy_parent[i]
+                for xi in range(len(copy_parent)):
+                    if copy_parent[xi] == ind2:
+                        del copy_parent[xi]
                         break
         if ind1.get_descendents()<=0:
-            for i in range(len(copy_parent)):
-                if copy_parent[i] == ind1:
-                    del copy_parent[i]
+            for xi in range(len(copy_parent)):
+                if copy_parent[xi] == ind1:
+                    del copy_parent[xi]
                     break
+        if bandera==0:
+            i+=1
     return r
 

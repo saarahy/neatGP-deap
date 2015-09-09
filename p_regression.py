@@ -49,8 +49,8 @@ with open("exp_x.txt") as spambase:
 #print spam
 #print [x/10. for x in range(-20,20)]
 
-toolbox.register("evaluate", evalSymbReg, points=spam)
-toolbox.register("evaluate_test", evalSymbReg, points=spam)
+toolbox.register("evaluate", evalSymbReg, points=[x/10. for x in range(-20,40)])
+toolbox.register("evaluate_test", evalSymbReg, points=[x/10. for x in range(-10,10)])
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
@@ -68,12 +68,9 @@ def main():
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
-  
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.9, 0.05, 10, stats=mstats,
-                                   halloffame=hof, verbose=True, neat=True)
+    params=['best_of_each_specie',2,'yes']
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 10,False,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
 
-    for ind in pop:
-        print ind.fitness.values
 
     print("Best individual is: ", str(hof[0]), hof[0].fitness, hof[0].fitness_test)
     print("Best individual is: ", str(hof[1]), hof[1].fitness, hof[1].fitness_test)

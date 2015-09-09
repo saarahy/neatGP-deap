@@ -16,9 +16,18 @@ def neatcx(ind1, ind2):
     for i in e1:
         if random.random()<0.5:
             e=random.choice(e2)
-            slice1=ind1.searchSubtree(i)
-            slice2=ind2.searchSubtree(e)
+            # out=open('subtree.txt','a')
+            # out.write('\n ind1:%s ind2:%s e1:%s e2:%s i:%s e:%s'%(ind1, ind2, e1, e2,i,e))
+            if len(ind1)==1:
+                slice1=ind1.searchSubtree(0)
+            else:
+                slice1=ind1.searchSubtree(i)
+            if len(ind2)==1:
+                slice2=ind2.searchSubtree(0)
+            else:
+                slice2=ind2.searchSubtree(e)
             ind1[slice1], ind2[slice2]=ind2[slice2], ind1[slice1]
+            # out.close()
             break
     return  ind1
 
