@@ -54,8 +54,8 @@ with open("train_x.txt") as spamb:
 #print spam
 #print [x/10. for x in range(-20,20)]
 
-toolbox.register("evaluate", evalSymbReg, points=spam2)
-toolbox.register("evaluate_test", evalSymbReg, points=spam)
+toolbox.register("evaluate", evalSymbReg, points=[x/10. for x in range(-20,20)])
+toolbox.register("evaluate_test", evalSymbReg, points=[x/10. for x in range(-20,20)])
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
@@ -74,7 +74,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 20,True,0.15,params,20,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 20,True,0.15,params,100,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('texto.txt', 'w')
 

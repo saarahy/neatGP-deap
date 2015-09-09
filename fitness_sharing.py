@@ -20,13 +20,12 @@ def SpeciesPunishment(population,params):
                 if penalizar==1:
                     ind.fitness_sharing(ind.fitness.values)
                 if penalizar==2:
-                    adj_fit=ind.fitness.values * int(ind.get_numspecie())
+                    adj_fit=ind.fitness.values[0] * int(ind.get_numspecie())
                     ind.fitness_sharing(adj_fit)
             ind.penalty(True)
         elif protect=='no':
             ind.fitness_sharing(ind.fitness.values)
             ind.penalty(True)
-
     #Habra que revisar si se puede optimizar este proceso
     if salvar=='best_specie':
         id_mejor=0
@@ -52,14 +51,13 @@ def SpeciesPunishment(population,params):
                         fitness_mejor=ind.fitness.values
                         nodos_mejor=len(ind)
                         level_mejor=ind.height
-
         if id_mejor!=0 or id_mejor!=None:
-            population[id_mejor].fitness_sharing(population[id_mejor].fitness.values)
+            population[id_mejor].fitness_sharing(population[id_mejor].fitness.values[0])
     elif salvar=='best_of_each_specie':
         #regresa la lista con la especie & cuantos elementos pertenecen en ella
         specie=ind_specie(population)
         id_mejor=0
-        fitness_mejor=9999999999
+        fitness_mejor=9999999999.00
         nodos_mejor=9999999999
         level_mejor=9999999999
         contador=0
@@ -67,15 +65,15 @@ def SpeciesPunishment(population,params):
             for ind, i in zip(population, range(len(population))):
                 if ind.get_specie()==e[0]:
                     contador+=1
-                    if ind.fitness.values<fitness_mejor:
+                    if ind.fitness.values[0]<fitness_mejor:
                         id_mejor=i
                         fitness_mejor=ind.fitness.values
                         nodos_mejor=len(ind)
                         level_mejor=ind.height
-                    elif ind.fitness.values==fitness_mejor:
+                    elif ind.fitness.values[0]==fitness_mejor:
                         if len(ind)<nodos_mejor:
                             id_mejor=i
-                            fitness_mejor=ind.fitness.values
+                            fitness_mejor[0]=ind.fitness.values
                             nodos_mejor=len(ind)
                             level_mejor=ind.height
                         elif len(ind)==nodos_mejor:
@@ -86,5 +84,13 @@ def SpeciesPunishment(population,params):
                                 level_mejor=ind.height
                 if contador==e[1]:
                     break
+            ##out=open('fith.txt','a')
+            for ind in population:
+                #out.write('\n %s' %(ind.get_fsharing()))
+                lst=list(ind.fitness.values)
+                lst[0]=ind.get_fsharing()
+                ind.fitness.values=tuple(lst)
+            #out.close()
             if id_mejor!=0 or id_mejor!=None:
-                population[id_mejor].fitness_sharing(population[id_mejor].fitness.values)
+                population[id_mejor].fitness_sharing(fitness_mejor)
+            #    population[id_mejor].fitness.values=fitness_mejor,

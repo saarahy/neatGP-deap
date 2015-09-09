@@ -9,7 +9,7 @@ def p_selection(population):
         survival=0.5
         #sacar promedio para penalizar
         prom_ap_penal=avg(population)
-        print 'promedio:',prom_ap_penal
+
         #penalizar al promedio
         if prom_ap_penal>10:
             prom_ap_penal=10
@@ -23,7 +23,7 @@ def p_selection(population):
 
         #obtener numero de especies
         specie=ind_specie(q)
-        print specie
+
         #crear grupos auxilares
         gpo_specie=list()
         parents=list()
@@ -33,23 +33,20 @@ def p_selection(population):
             for ind in q:
                 if ind.get_specie()==e[0]:
                     contador+=1
-                    #print 'ind'
                     gpo_specie.append(ind)
                 if contador==e[1]:
-                    #print 'hey'
                     parents.append(eliminar_ind(gpo_specie,survival))
                     gpo_specie=list()
                     contador=0
-        for ind in parents:
-            if ind!=[]:
-                gparents.append(ind[0][0])
+        for especie in parents:
+            for ind in especie:
+                gparents.append(ind)
         return gparents
 
 
 
 
 def num_desc(ind, avg):
-    #print 'ind', ind
     int1=list(ind.fitness.values)
     int1=float(int1[0])
     numd=round(avg/int1)
@@ -70,8 +67,6 @@ def sort_fitness(population):
     for ind in population:
         allpotfit.append([ind, ind.fitness.values, ind.get_fsharing()])
     orderbyfit=sorted(allpotfit, key=lambda ind: ind[2])
-    #for ind in orderbyfit:
-        #print ind[0]
     return orderbyfit
 
 def eliminar_ind(gpo_specie, survival):
@@ -81,6 +76,7 @@ def eliminar_ind(gpo_specie, survival):
     for i in range(indice):
        del reverse_gpo[0]
     sort_gpo=sorted(reverse_gpo, key=lambda ind:ind[2])
-    #for ind in sort_gpo:
-        #print ind[0]
-    return sort_gpo
+    parnt=list()
+    for i in range(len(sort_gpo)):
+        parnt.append(sort_gpo[i][0])
+    return parnt
