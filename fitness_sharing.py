@@ -16,16 +16,22 @@ def SpeciesPunishment(population,params):
             if ind.get_specie()==None or ind.get_specie()==0:
                 ind.specie(1)
                 ind.penalty(True)
-            else:
-                if penalizar==1:
-                    ind.fitness_sharing(ind.fitness.values)
-                if penalizar==2:
-                    adj_fit=ind.fitness.values[0] * int(ind.get_numspecie())
-                    ind.fitness_sharing(adj_fit)
+                ind.fitness_sharing(ind.fitness.values[0])
+            #else:
+            if penalizar==1:
+                ind.fitness_sharing(ind.fitness.values)
+            if penalizar==2:
+                num_ind=get_specie_ind(ind,population)
+                adj_fit=ind.fitness.values[0] * int(num_ind)
+                ind.fitness_sharing(adj_fit)
             ind.penalty(True)
         elif protect=='no':
-            ind.fitness_sharing(ind.fitness.values)
+            ind.fitness_sharing(ind.fitness.values[0])
             ind.penalty(True)
+    out=open('aagh.txt','a')
+    for ind in population:
+        out.write('\n %s %s %s %s'% (ind.get_fsharing(),ind.fitness.values, ind.get_specie(), ind))
+    out.close()
     #Habra que revisar si se puede optimizar este proceso
     if salvar=='best_specie':
         id_mejor=0
@@ -73,7 +79,7 @@ def SpeciesPunishment(population,params):
                     elif ind.fitness.values[0]==fitness_mejor:
                         if len(ind)<nodos_mejor:
                             id_mejor=i
-                            fitness_mejor[0]=ind.fitness.values
+                            fitness_mejor=ind.fitness.values
                             nodos_mejor=len(ind)
                             level_mejor=ind.height
                         elif len(ind)==nodos_mejor:
@@ -84,13 +90,9 @@ def SpeciesPunishment(population,params):
                                 level_mejor=ind.height
                 if contador==e[1]:
                     break
-            ##out=open('fith.txt','a')
-            for ind in population:
-                #out.write('\n %s' %(ind.get_fsharing()))
-                lst=list(ind.fitness.values)
-                lst[0]=ind.get_fsharing()
-                ind.fitness.values=tuple(lst)
-            #out.close()
+            lst=list(ind.fitness.values)
+            lst[0]=ind.get_fsharing()
+            ind.fitness.values=tuple(lst)
             if id_mejor!=0 or id_mejor!=None:
                 population[id_mejor].fitness_sharing(fitness_mejor)
             #    population[id_mejor].fitness.values=fitness_mejor,

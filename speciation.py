@@ -32,6 +32,15 @@ def ind_specie(population):
         set_numind(ind, num)
     return num
 
+#regresa el numero de individuos en una especie dada
+def get_specie_ind(individuo, population):
+    cont=0
+    specie=individuo.get_specie()
+    for ind in population:
+        if ind.get_specie()==specie:
+            cont+=1
+    return cont
+
 #funcion para asignar el numero de individuos
 #en la especie, al individuo de esa misma especie
 
