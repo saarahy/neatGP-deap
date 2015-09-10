@@ -18,6 +18,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
         bandera=0
         if n>len(copy_parent):
             lim=int(round(n/len(copy_parent)))
+            lim=lim*2
             for d in range(lim):
                 copy_parent+=copy_parent
         eflag=int(round(random.random()))
@@ -29,6 +30,8 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             bandera=1
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
+            offspring[0].descendents(0)
+            offspring[0].fitness_sharing(0)
             r.append(offspring[0])
             ind1.descendents(ind1.get_descendents()-1)
             i+=1
@@ -43,6 +46,8 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             of1=copy.deepcopy(ind1)
             of2=copy.deepcopy(ind2)
             hijo=neatcx(of1,of2)
+            hijo.descendents(0)
+            hijo.fitness_sharing(0)
             r.append(hijo)
             ind1.descendents(ind1.get_descendents()-0.5)
             ind2.descendents(ind2.get_descendents()-0.5)
