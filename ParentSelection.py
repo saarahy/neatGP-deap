@@ -28,6 +28,7 @@ def p_selection(population):
         gpo_specie=list()
         parents=list()
         gparents=list()
+        gsparents=list()
         contador=0
         for e in specie:
             for ind in q:
@@ -40,7 +41,11 @@ def p_selection(population):
                     contador=0
         for especie in parents:
             for ind in especie:
-                gparents.append(ind)
+                gparents.append([ind, ind.fitness.values])
+        gsparents=sorted(gparents, key=lambda ind:ind[1])
+        gparents=list()
+        for ind in gsparents:
+            gparents.append(ind[0])
         return gparents
 
 def num_desc(ind, avg):

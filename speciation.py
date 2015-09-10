@@ -55,7 +55,11 @@ def species(population, h):
     for ind in population:
         if ind.get_specie()==None:
             for ind1 in population:
-                if distance(ind,ind1)<=h:
+                #if lenght of the ind is equal to 0
+                #assigne to specie 1
+                if (len(ind)==1):
+                    ind.specie(1)
+                elif distance(ind,ind1)<=h:
                     ind.specie(ind1.get_specie())
                     break
             if ind.get_specie()==None:
