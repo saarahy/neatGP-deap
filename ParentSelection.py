@@ -43,15 +43,13 @@ def p_selection(population):
                 gparents.append(ind)
         return gparents
 
-
-
-
 def num_desc(ind, avg):
     int1=list(ind.fitness.values)
     int1=float(int1[0])
+    if int1==0.0:
+        int1=1
     numd=round(avg/int1)
     return int(numd)
-
 
 def avg(population):
     suma=0
