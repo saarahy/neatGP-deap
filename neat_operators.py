@@ -32,6 +32,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             offspring=toolbox.mutate(of)
             offspring[0].descendents(0)
             offspring[0].fitness_sharing(0)
+            del offspring[0].fitness.values
             r.append(offspring[0])
             ind1.descendents(ind1.get_descendents()-1)
             i+=1
@@ -48,6 +49,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             hijo=neatcx(of1,of2)
             hijo.descendents(0)
             hijo.fitness_sharing(0)
+            del hijo.fitness.values
             r.append(hijo)
             ind1.descendents(ind1.get_descendents()-0.5)
             ind2.descendents(ind2.get_descendents()-0.5)
