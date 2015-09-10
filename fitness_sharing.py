@@ -28,10 +28,6 @@ def SpeciesPunishment(population,params):
         elif protect=='no':
             ind.fitness_sharing(ind.fitness.values[0])
             ind.penalty(True)
-    out=open('aagh.txt','a')
-    for ind in population:
-        out.write('\n %s %s %s %s'% (ind.get_fsharing(),ind.fitness.values, ind.get_specie(), ind))
-    out.close()
     #Habra que revisar si se puede optimizar este proceso
     if salvar=='best_specie':
         id_mejor=0
@@ -40,21 +36,21 @@ def SpeciesPunishment(population,params):
         level_mejor=9999999999
 
         for ind, i in population, range(population):
-            if ind.fitness.values<fitness_mejor:
+            if ind.fitness.values[0]<fitness_mejor:
                 id_mejor=i
-                fitness_mejor=ind.fitness.values
+                fitness_mejor=ind.fitness.values[0]
                 nodos_mejor=len(ind)
                 level_mejor=ind.height
-            elif ind.fitness.values==fitness_mejor:
+            elif ind.fitness.values[0]==fitness_mejor:
                 if len(ind)<nodos_mejor:
                     id_mejor=i
-                    fitness_mejor=ind.fitness.values
+                    fitness_mejor=ind.fitness.values[0]
                     nodos_mejor=len(ind)
                     level_mejor=ind.height
                 elif len(ind)==nodos_mejor:
                     if ind.height<level_mejor:
                         id_mejor=i
-                        fitness_mejor=ind.fitness.values
+                        fitness_mejor=ind.fitness.values[0]
                         nodos_mejor=len(ind)
                         level_mejor=ind.height
         if id_mejor!=0 or id_mejor!=None:
@@ -62,37 +58,37 @@ def SpeciesPunishment(population,params):
     elif salvar=='best_of_each_specie':
         #regresa la lista con la especie & cuantos elementos pertenecen en ella
         specie=ind_specie(population)
-        id_mejor=0
-        fitness_mejor=9999999999.00
-        nodos_mejor=9999999999
-        level_mejor=9999999999
-        contador=0
         for e in specie:
+            contador=0
+            id_mejor=0
+            fitness_mejor=9999999999.00
+            nodos_mejor=9999999999
+            level_mejor=9999999999
             for ind, i in zip(population, range(len(population))):
                 if ind.get_specie()==e[0]:
                     contador+=1
                     if ind.fitness.values[0]<fitness_mejor:
                         id_mejor=i
-                        fitness_mejor=ind.fitness.values
+                        fitness_mejor=ind.fitness.values[0]
                         nodos_mejor=len(ind)
                         level_mejor=ind.height
                     elif ind.fitness.values[0]==fitness_mejor:
                         if len(ind)<nodos_mejor:
                             id_mejor=i
-                            fitness_mejor=ind.fitness.values
+                            fitness_mejor=ind.fitness.values[0]
                             nodos_mejor=len(ind)
                             level_mejor=ind.height
                         elif len(ind)==nodos_mejor:
                             if ind.height<level_mejor:
                                 id_mejor=i
-                                fitness_mejor=ind.fitness.values
+                                fitness_mejor=ind.fitness.values[0]
                                 nodos_mejor=len(ind)
                                 level_mejor=ind.height
+                    lst=list(ind.fitness.values)
+                    lst[0]=ind.get_fsharing()
+                    ind.fitness.values=tuple(lst)
                 if contador==e[1]:
                     break
-            lst=list(ind.fitness.values)
-            lst[0]=ind.get_fsharing()
-            ind.fitness.values=tuple(lst)
             if id_mejor!=0 or id_mejor!=None:
                 population[id_mejor].fitness_sharing(fitness_mejor)
-            #    population[id_mejor].fitness.values=fitness_mejor,
+                population[id_mejor].fitness.values=fitness_mejor,

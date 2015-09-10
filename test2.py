@@ -62,7 +62,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
