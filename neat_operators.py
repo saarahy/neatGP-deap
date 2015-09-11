@@ -8,6 +8,7 @@
 #la clase, este parametro podria ser omitido
 import random
 from neat_gp import *
+from ParentSelection import sort_fitnessvalues
 from crosspoints import *
 def neatGP(toolbox,parents,cxpb,mutpb,n):
     r=list()
@@ -70,5 +71,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
                     break
         if bandera==0:
             i+=1
+        if len(r)>=n:
+            break
     return r
 
