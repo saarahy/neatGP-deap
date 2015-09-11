@@ -54,8 +54,8 @@ with open("train_x.txt") as spamb:
 #print spam
 #print [x/10. for x in range(-20,20)]
 
-toolbox.register("evaluate", evalSymbReg, points=[x/10. for x in range(-20,20)])
-toolbox.register("evaluate_test", evalSymbReg, points=[x/10. for x in range(-20,20)])
+toolbox.register("evaluate", evalSymbReg, points=spam2)
+toolbox.register("evaluate_test", evalSymbReg, points=spam)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
@@ -82,6 +82,11 @@ def main():
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
 
+    sortf=sort_fitnessvalues(pop)
+    for ind in sortf:
+        outfile.write("\n ind: %s %s %s " % (ind.fitness.values, ind.get_fsharing(), ind))
+
+    outfile.close()
     return pop, log, hof
 
 if __name__ == "__main__":

@@ -64,12 +64,17 @@ def avg(population):
     promedio=suma/len(population)
     return promedio
 
-def sort_fitness(population):
+def sort_fitness(population): #ordena la poblacion y regresa una lista con el ind y sus dos aptitudes
     allpotfit=list()
     orderbyfit=list()
     for ind in population:
         allpotfit.append([ind, ind.fitness.values, ind.get_fsharing()])
     orderbyfit=sorted(allpotfit, key=lambda ind: ind[2])
+    return orderbyfit
+
+def sort_fitnessvalues(population): #ordena la poblacion y regresa la poblacion ordenada
+    orderbyfit=list()
+    orderbyfit=sorted(population, key=lambda ind:ind.fitness.values)
     return orderbyfit
 
 def eliminar_ind(gpo_specie, survival):
