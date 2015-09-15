@@ -15,8 +15,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
     i=0
     copy_parent=copy.deepcopy(parents)
 
-    while i<n or (len(r)+len(parents))<n:
-        bandera=0
+    while i<n:
         if n>len(copy_parent):
             lim=int(round(n/len(copy_parent)))
             lim=lim*2
@@ -28,16 +27,21 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
         else:
             ind1=random.choice(copy_parent)
         if random.random()<mutpb:
-            bandera=1
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
             offspring[0].descendents(0)
             offspring[0].fitness_sharing(0)
             offspring[0].specie(None)
             del offspring[0].fitness.values
-            r.append(offspring[0])
+
+            if i<n:
+                r.append(offspring[0])
+                i+=1
+            else:
+                break
+
             ind1.descendents(ind1.get_descendents()-1)
-            i+=1
+
         if random.random()<cxpb:
             if ind1.get_numspecie()>1:
                 for q in copy_parent:
@@ -53,12 +57,16 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
             hijo.fitness_sharing(0)
             hijo.specie(None)
             del hijo.fitness.values
-            r.append(hijo)
+
+            if i<n:
+                r.append(hijo)
+                i+=1
+            else:
+                break
+
             ind1.descendents(ind1.get_descendents()-0.5)
             ind2.descendents(ind2.get_descendents()-0.5)
-            if bandera==0:
-                i+=1
-            bandera=1
+
             if ind2.get_descendents()<=0:
                 for xi in range(len(copy_parent)):
                     if copy_parent[xi] == ind2:
@@ -69,9 +77,5 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
                 if copy_parent[xi] == ind1:
                     del copy_parent[xi]
                     break
-        if bandera==0:
-            i+=1
-        if len(r)>=n:
-            break
     return r
 
