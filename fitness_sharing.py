@@ -14,7 +14,8 @@ def SpeciesPunishment(population,params):
     for ind in population:
         if protect=='yes':
             if ind.get_specie()==None or ind.get_specie()==0:
-                ind.specie(1)
+                specie_ind(population,ind,h)
+                #ind.specie(1)
                 ind.penalty(True)
                 ind.fitness_sharing(ind.fitness.values[0])
             #else:
