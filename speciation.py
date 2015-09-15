@@ -70,5 +70,18 @@ def species(population, h):
                 ind.specie(num_specie+1)
     return population
 
+#asignar la especie de un individuo especifico
+def specie_ind(population,ind, h):
+    for ind_p in population:
+        if ind_p.get_specie()!=None:
+            if distance(ind, ind_p)<=h:
+                ind.specie(ind_p.get_specie())
+                break
+    if ind.get_specie()==None:
+        num_specie=count_species(population)
+        ind.specie(num_specie+1)
+    return ind
+
+#
 
 
