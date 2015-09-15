@@ -36,7 +36,8 @@ def p_selection(population):
                     contador+=1
                     gpo_specie.append(ind)
                 if contador==e[1]:
-                    parents.append(eliminar_ind(gpo_specie,survival))
+                    #parents.append(eliminar_ind(gpo_specie,survival))
+                    parents.append(penalizar_ind(gpo_specie,survival))
                     gpo_specie=list()
                     contador=0
         for especie in parents:
@@ -44,8 +45,9 @@ def p_selection(population):
                 gparents.append([ind, ind.fitness.values])
         gsparents=sorted(gparents, key=lambda ind:ind[1])
         gparents=list()
-        for ind in gsparents:
-            gparents.append(ind[0])
+        indice=int(round(len(gsparents)-(len(gsparents)*survival)))
+        for ind in range(indice):
+            gparents.append(gsparents[ind][0])
         return gparents
 
 def num_desc(ind, avg):
@@ -77,12 +79,27 @@ def sort_fitnessvalues(population): #ordena la poblacion y regresa la poblacion 
     orderbyfit=sorted(population, key=lambda ind:ind.fitness.values)
     return orderbyfit
 
+
 def eliminar_ind(gpo_specie, survival):
     sort_gpo=sort_fitness(gpo_specie)
     indice=int(round(len(sort_gpo)-(len(sort_gpo)*survival)))
     reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[2],reverse=True)
     for i in range(indice):
        del reverse_gpo[0]
+    sort_gpo=sorted(reverse_gpo, key=lambda ind:ind[2])
+    parnt=list()
+    for i in range(len(sort_gpo)):
+        parnt.append(sort_gpo[i][0])
+    return parnt
+
+def penalizar_ind(gpo_specie, survival):
+    sort_gpo=sort_fitness(gpo_specie)
+    indice=int(round(len(sort_gpo)-(len(sort_gpo)*survival)))
+    reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[2],reverse=True)
+    for i in range(indice):
+        reverse_gpo[i][0].fitness.values=999999999.00,
+        reverse_gpo[i][1]=999999999.00
+        reverse_gpo[i][2]=999999999.00
     sort_gpo=sorted(reverse_gpo, key=lambda ind:ind[2])
     parnt=list()
     for i in range(len(sort_gpo)):
