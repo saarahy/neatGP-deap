@@ -5,7 +5,7 @@ def print_fit(population):
     for ind in population:
         print ind.fitness.values
 
-def SpeciesPunishment(population,params):
+def SpeciesPunishment(population,params,h):
     salvar=params[0] #params.DontPenaliza
     penalizar=params[1] #param.penalization_method
     protect=params[2] #params.sharefitness

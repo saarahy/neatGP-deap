@@ -15,7 +15,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
     i=0
     copy_parent=copy.deepcopy(parents)
 
-    while i<n or len(r)<n:
+    while i<n or (len(r)+len(parents))<n:
         bandera=0
         if n>len(copy_parent):
             lim=int(round(n/len(copy_parent)))
