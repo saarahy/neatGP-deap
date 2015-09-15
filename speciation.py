@@ -20,14 +20,17 @@ def count_species(population):
 
 #funcion para contar los individuos de una especie
 def ind_specie(population):
-    specie=list()
+    specie2=list()
     num=list()
     for ind in population:
-        specie.append(ind.get_specie())
-    specie.sort()
-    for i in range(len(specie)):
-        if specie[i]!=specie[i-1]:
-            num.append([specie[i],specie.count(specie[i])])
+        specie2.append(ind.get_specie())
+    specie=sorted(specie2)
+    if specie.count(specie[0])==len(population):
+        num.append([specie[0],specie.count(specie[0])])
+    else:
+        for i in range(len(specie)):
+            if specie[i]!=specie[i-1]:
+                num.append([specie[i],specie.count(specie[i])])
     for ind in population:
         set_numind(ind, num)
     return num
@@ -54,12 +57,12 @@ def set_numind(ind,species):
 def species(population, h):
     for ind in population:
         if ind.get_specie()==None:
+            if (len(ind)==1):
+                ind.specie(1)
+                break
             for ind1 in population:
                 if ind1.get_specie()!=None:
-                    if (len(ind)==1):
-                        ind.specie(1)
-                        break
-                    elif distance(ind,ind1)<=h:
+                    if distance(ind,ind1)<=h:
                         ind.specie(ind1.get_specie())
                         break
             if ind.get_specie()==None:
