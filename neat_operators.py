@@ -9,8 +9,9 @@
 import random
 from neat_gp import *
 from ParentSelection import sort_fitnessvalues
+from speciation import get_specie_ind
 from crosspoints import *
-def neatGP(toolbox,parents,cxpb,mutpb,n):
+def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
     r=list()
     i=0
     copy_parent=copy.deepcopy(parents)
@@ -18,15 +19,15 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
     while i<n:
         if n>len(copy_parent):
             lim=int(round(n/len(copy_parent)))
-            lim=lim*2
             for d in range(lim):
                 copy_parent+=copy_parent
+
         eflag=int(round(random.random()))
         if eflag:
-            ind1=copy_parent[0] #el mejor individuo debido su fitnes
+            ind1=copy_parent[0] #el mejor individuo debido su fitness
         else:
             ind1=random.choice(copy_parent)
-        if random.random()<mutpb:
+        if mut==1 and random.random()<mutpb:#
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
             offspring[0].descendents(0)
@@ -41,33 +42,39 @@ def neatGP(toolbox,parents,cxpb,mutpb,n):
                 break
 
             ind1.descendents(ind1.get_descendents()-1)
-
-        if random.random()<cxpb:
-            if ind1.get_numspecie()>1:
-                for q in copy_parent:
-                    if q.get_specie()==ind1.get_specie():
-                        ind2=q
+        elif cx==1:
+            #out=open('neatcx.txt','a')
+            #out.write('\n ind:%s'%(ind1))
+            ind_nspecie=get_specie_ind(ind1,copy_parent)
+            if ind_nspecie > 1:
+                #out.write('\n num_specie:%s'%(ind_nspecie))
+                for q in range(len(copy_parent)):
+                    if copy_parent[q].get_specie() == ind1.get_specie():
+                        ind2 = copy_parent[q]
                         break
             else:
-                ind2=random.choice(copy_parent)
-            of1=copy.deepcopy(ind1)
-            of2=copy.deepcopy(ind2)
-            hijo=neatcx(of1,of2)
+                ind2 = random.choice(copy_parent)
+            #out.write('\n ind2:%s'%(ind2))
+            of1 = copy.deepcopy(ind1)
+            of2 = copy.deepcopy(ind2)
+            hijo = neatcx(of1, of2)
+            #out.write('\nhijo:%s' %(hijo))
+            #out.close()
             hijo.descendents(0)
             hijo.fitness_sharing(0)
             hijo.specie(None)
             del hijo.fitness.values
 
-            if i<n:
+            if i < n:
                 r.append(hijo)
-                i+=1
+                i += 1
             else:
                 break
 
-            ind1.descendents(ind1.get_descendents()-0.5)
-            ind2.descendents(ind2.get_descendents()-0.5)
+            ind1.descendents(ind1.get_descendents() - 0.5)
+            ind2.descendents(ind2.get_descendents() - 0.5)
 
-            if ind2.get_descendents()<=0:
+            if ind2.get_descendents() <= 0:
                 for xi in range(len(copy_parent)):
                     if copy_parent[xi] == ind2:
                         del copy_parent[xi]

@@ -5,13 +5,13 @@ import csv
 import numpy
 
 from deap import algorithms
-from deap import base
-from deap import creator
-from deap import tools
-from deap import gp
-from fitness_sharing import *
-from speciation import *
-from ParentSelection import *
+# from deap import base
+# from deap import creator
+# from deap import tools
+# from deap import gp
+# from fitness_sharing import *
+# from speciation import *
+# from ParentSelection import *
 from neat_operators import *
 
 def safeDiv(left, right):
@@ -19,6 +19,11 @@ def safeDiv(left, right):
         return left / right
     except ZeroDivisionError:
         return 0
+def mylog(x):
+    if x==0:
+        return 0
+    else:
+        return math.log10(abs(x))
 
 pset = gp.PrimitiveSet("MAIN", 1)
 pset.addPrimitive(operator.add, 2)
@@ -27,6 +32,8 @@ pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safeDiv, 2)
 pset.addPrimitive(math.cos, 1)
 pset.addPrimitive(math.sin, 1)
+#pset.addPrimitive(math.exp,1)
+pset.addPrimitive(mylog,1)
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -62,7 +69,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=250)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -74,7 +81,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,250,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,100,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('popfinal.txt', 'w')
 

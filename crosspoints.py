@@ -5,19 +5,12 @@ from measure_tree import *
 def neatcx(ind1, ind2):
     e1,e2=ext_node(ind1,ind2)
     l1,l2=int_node(ind1,ind2)
-
-#cambio de nodo interno
-    for i in range(len(l1)):
+    for i in range(len(l1)): #cambio de nodo interno
         if random.random()<0.5:
-            ind1[l1[i][0]]=l1[i][1]
-            #ind1[i[0]]=l2[i[0]][2]
-            #break
-#camio de nodos externos
-    for i in e1:
+            ind1[l1[i][0]]=l2[i][1]
+    for i in e1: #camio de nodos externos
         if random.random()<0.5:
             e=random.choice(e2)
-            # out=open('subtree.txt','a')
-            # out.write('\n ind1:%s ind2:%s e1:%s e2:%s i:%s e:%s'%(ind1, ind2, e1, e2,i,e))
             if len(ind1)==1:
                 slice1=ind1.searchSubtree(0)
             else:
@@ -27,9 +20,8 @@ def neatcx(ind1, ind2):
             else:
                 slice2=ind2.searchSubtree(e)
             ind1[slice1], ind2[slice2]=ind2[slice2], ind1[slice1]
-            # out.close()
             break
-    return  ind1
+    return ind1
 
 def int_node(ind1, ind2):
     cont1=0
@@ -38,20 +30,14 @@ def int_node(ind1, ind2):
     label2=list()
     maxim=max(len(ind1), len(ind2))
     maxim=maxim-1
-    #print 'maxim', maxim
     while (cont1<maxim) and (cont2<maxim):
-        #print cont1, cont2, ind1, ind2
         if ind1[cont1].arity==ind2[cont2].arity and ind1[cont1].arity>0:
             if cont1==0:
                 label1.append([cont1,ind1[cont1]])
                 label2.append([cont2,ind2[cont2]])
-                #print label1, label2
             else:
-                #c1=cont1
-                #c2=cont2
                 label1.append([cont1,ind1[cont1]])
                 label2.append([cont2,ind2[cont2]])
-                #print label1, label2
             cont1+=1
             cont2+=1
         elif ind1[cont1].arity==ind2[cont2].arity and ind1[cont1].arity==0:
