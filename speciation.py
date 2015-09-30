@@ -99,10 +99,11 @@ def specie_parents_child(parents, offspring, h):
                         break
             if ind.get_specie()==None:
                 num_specie=count_species(parents)
-                num_specieh=count_species(offspring)
-                num_s=max(num_specie,num_specieh)
-                ind.specie(num_s+1)
-    return offspring
+                ind.specie(num_specie+1)
+                parents.append(ind)
+                offspring.remove(ind)
+
+    return parents
 
 
 
