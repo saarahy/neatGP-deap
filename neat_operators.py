@@ -54,18 +54,21 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
             ind_nspecie=get_specie_ind(ind1,copy_parent)
             if ind_nspecie > 1:
                 out.write('\n num_specie:%s'%(ind_nspecie))
+                ind2=[]
                 for q in range(len(copy_parent)):
                     if copy_parent[q].get_specie() == ind1.get_specie() and copy_parent[q]!=ind1:
                         ind2 = copy_parent[q]
                         break
-                    else:
-                        #elitista
-                        try:
-                            ind2=elitism_choice(ind1, copy_parent)
-                        except:
+                if ind2==[]:
+                    try:
+                        out.write('\nelistista')
+                        ind2=elitism_choice(ind1, copy_parent)
+                    except:
                         #al azar
-                            ind2 = random.choice(copy_parent)
+                        out.write('\azar')
+                        ind2 = random.choice(copy_parent)
             else:
+                out.write('\naleatorio')
                 ind2 = random.choice(copy_parent)
             out.write('\n ind2:%s'%(ind2))
             of1 = copy.deepcopy(ind1)
