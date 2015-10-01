@@ -5,11 +5,13 @@ from measure_tree import *
 def neatcx(ind1, ind2):
     e1,e2=ext_node(ind1,ind2)
     l1,l2=int_node(ind1,ind2)
+    flag=0
     for i in range(len(l1)): #cambio de nodo interno
         if random.random()<0.5:
             ind1[l1[i][0]]=l2[i][1]
+            flag=1
     for i in e1: #camio de nodos externos
-        if random.random()<0.5:
+        if random.random()<0.5 or flag==0:
             e=random.choice(e2)
             if len(ind1)==1:
                 slice1=ind1.searchSubtree(0)
