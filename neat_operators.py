@@ -17,17 +17,17 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
     copy_parent=copy.deepcopy(parents)
 
     while i<n:
-        uout=open('parentscopy.txt','a')
+        #uout=open('parentscopy.txt','a')
         if n>len(copy_parent):
             lim=int(round(n/len(copy_parent)))
             for d in range(lim):
-                uout.write('\n++++')
+                #uout.write('\n++++')
                 copy_parent+=copy_parent
 
-        for ind in copy_parent:
-            uout.write('\n %s %s'%(ind.get_specie(), ind))
-        uout.write('\n----')
-        uout.close()
+        #for ind in copy_parent:
+            #uout.write('\n %s %s'%(ind.get_specie(), ind))
+        #uout.write('\n----')
+        #uout.close()
         eflag=int(round(random.random()))
         if eflag:
             ind1=copy_parent[0] #el mejor individuo debido su fitness
@@ -73,7 +73,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
             out.write('\n ind2:%s'%(ind2))
             of1 = copy.deepcopy(ind1)
             of2 = copy.deepcopy(ind2)
-            hijo = neatcx(of1, of2)
+            hijo = neatcx(of1, of2, toolbox)
             out.write('\nhijo:%s' %(hijo))
             out.close()
             hijo.descendents(0)

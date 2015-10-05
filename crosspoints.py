@@ -2,13 +2,16 @@ import random
 import copy
 from measure_tree import *
 
-def neatcx(ind1, ind2):
+def neatcx(ind1, ind2, toolbox):
     hijo=copy.deepcopy(ind1)
-    e1,e2=ext_node(ind1,ind2)
-    l1,l2=int_node(ind1,ind2)
     flag=0
     n=0
-    while n<20:
+    # out=open('hijos.txt','a')
+    # out.write('\ni1: %s'%(ind1))
+    # out.write('\ni2: %s'%(ind2))
+    while n<10:
+        e1,e2=ext_node(hijo,ind2)
+        l1,l2=int_node(hijo,ind2)
         for i in range(len(l1)): #cambio de nodo interno
             if random.random()<0.5:
                 hijo[l1[i][0]]=l2[i][1]
@@ -26,10 +29,24 @@ def neatcx(ind1, ind2):
                     slice2=ind2.searchSubtree(e)
                 hijo[slice1], ind2[slice2]=ind2[slice2], hijo[slice1]
                 break
-        if hijo==ind1:
+        if hijo==ind1 or hijo==ind2:
             n+=1
+            # out.write('\nn++')
         else:
             break
+    #out.write('\nh1: %s'%(hijo))
+    if hijo==ind1 or hijo==ind2:
+        n=0
+        while n<10:
+            off=toolbox.mutate(hijo)
+            if hijo==ind1 or hijo==ind2:
+                n+=1
+            else:
+                break
+        # out.write('\noff: %s'%(off))
+        # out.write('\nmutate')
+    # out.write('\nhf: %s'%(hijo))
+    # out.close()
     return hijo
 
 def int_node(ind1, ind2):
@@ -186,4 +203,5 @@ def tot_grpo(exp,nivel):
         if i[1]==nivel:
             total+=1
     return total
+
 
