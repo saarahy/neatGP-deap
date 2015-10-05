@@ -42,12 +42,12 @@ def p_selection(population):
                     contador=0
         for especie in parents:
             for ind in especie:
-                gparents.append([ind, ind.fitness.values])
-        gsparents=sorted(gparents, key=lambda ind:ind[1])
-        out=open('gsparents.txt','a')
-        for ind in gsparents:
-            out.write('\n  %s %s' %(ind[1], ind[0]))
-        out.close()
+                gparents.append([ind, ind.fitness.values, ind.get_fsharing(), ind.get_descendents()])
+        gsparents=sorted(gparents, key=lambda ind:(ind[1], ind[2]))
+        # out=open('gsparents.txt','a')
+        # for ind in gsparents:
+        #     out.write('\n  %s;%s;%s;%s' %(ind[1], ind[2], ind[3], ind[0]))
+        # out.close()
         gparents=list()
         indice=int(round(len(gsparents)-(len(gsparents)*survival)))
         for ind in range(indice):
@@ -75,14 +75,13 @@ def sort_fitness(population): #ordena la poblacion y regresa una lista con el in
     orderbyfit=list()
     for ind in population:
         allpotfit.append([ind, ind.fitness.values, ind.get_fsharing()])
-    orderbyfit=sorted(allpotfit, key=lambda ind: ind[1])
+    orderbyfit=sorted(allpotfit, key=lambda ind: ind[1], reverse=True)
     return orderbyfit
 
 def sort_fitnessvalues(population): #ordena la poblacion y regresa la poblacion ordenada
     orderbyfit=list()
     orderbyfit=sorted(population, key=lambda ind:ind.fitness.values)
     return orderbyfit
-
 
 def eliminar_ind(gpo_specie, survival):
     sort_gpo=sort_fitness(gpo_specie)
@@ -99,7 +98,8 @@ def eliminar_ind(gpo_specie, survival):
 def penalizar_ind(gpo_specie, survival):
     sort_gpo=sort_fitness(gpo_specie)
     indice=int(round(len(sort_gpo)-(len(sort_gpo)*survival)))
-    reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[1],reverse=True)
+    #reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[1],reverse=True)
+    reverse_gpo=sort_gpo
     for i in range(indice):
         reverse_gpo[i][0].fitness.values=999999999.00,
         reverse_gpo[i][1]=999999999.00

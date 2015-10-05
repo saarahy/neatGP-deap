@@ -65,11 +65,11 @@ toolbox.register("evaluate", evalSymbReg, points=spam2)
 toolbox.register("evaluate_test", evalSymbReg, points=spam)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genFull, min_=0, max_=6)
+toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=200)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -81,7 +81,7 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params=['best_of_each_specie',2,'yes']
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,500,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,True,0.15,params,200,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('popfinal.txt', 'w')
 
