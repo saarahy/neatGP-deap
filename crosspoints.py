@@ -3,27 +3,34 @@ import copy
 from measure_tree import *
 
 def neatcx(ind1, ind2):
+    hijo=copy.deepcopy(ind1)
     e1,e2=ext_node(ind1,ind2)
     l1,l2=int_node(ind1,ind2)
     flag=0
-    for i in range(len(l1)): #cambio de nodo interno
-        if random.random()<0.5:
-            ind1[l1[i][0]]=l2[i][1]
-            flag=1
-    for i in e1: #camio de nodos externos
-        if random.random()<0.5 or flag==0:
-            e=random.choice(e2)
-            if len(ind1)==1:
-                slice1=ind1.searchSubtree(0)
-            else:
-                slice1=ind1.searchSubtree(i)
-            if len(ind2)==1:
-                slice2=ind2.searchSubtree(0)
-            else:
-                slice2=ind2.searchSubtree(e)
-            ind1[slice1], ind2[slice2]=ind2[slice2], ind1[slice1]
+    n=0
+    while n<20:
+        for i in range(len(l1)): #cambio de nodo interno
+            if random.random()<0.5:
+                hijo[l1[i][0]]=l2[i][1]
+                flag=1
+        for i in e1: #camio de nodos externos
+            if random.random()<0.5 or flag==0:
+                e=random.choice(e2)
+                if len(ind1)==1:
+                    slice1=hijo.searchSubtree(0)
+                else:
+                    slice1=hijo.searchSubtree(i)
+                if len(ind2)==1:
+                    slice2=ind2.searchSubtree(0)
+                else:
+                    slice2=ind2.searchSubtree(e)
+                hijo[slice1], ind2[slice2]=ind2[slice2], hijo[slice1]
+                break
+        if hijo==ind1:
+            n+=1
+        else:
             break
-    return ind1
+    return hijo
 
 def int_node(ind1, ind2):
     cont1=0
