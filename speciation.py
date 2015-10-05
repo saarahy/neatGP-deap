@@ -102,7 +102,6 @@ def specie_parents_child(parents, offspring, h):
                 ind.specie(num_specie+1)
                 parents.append(ind)
                 offspring.remove(ind)
-
     return parents
 
 
