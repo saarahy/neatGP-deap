@@ -7,7 +7,6 @@
 #n es el numero de hijos descendientes que se espera que regrese
 #la clase, este parametro podria ser omitido
 import random
-#from neat_gp import *
 from ParentSelection import sort_fitnessvalues
 from speciation import get_specie_ind, ind_specie
 from crosspoints import *
@@ -17,23 +16,15 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
     copy_parent=copy.deepcopy(parents)
 
     while i<n:
-        #uout=open('parentscopy.txt','a')
-        if n>len(copy_parent):
-            lim=int(round(n/len(copy_parent)))
-            for d in range(lim):
-                #uout.write('\n++++')
-                copy_parent+=copy_parent
+        if n>len(copy_parent): #if the parent pool is less than the number of child
+            copy_parent[:]=copy.deepcopy(parents)
 
-        #for ind in copy_parent:
-            #uout.write('\n %s %s'%(ind.get_specie(), ind))
-        #uout.write('\n----')
-        #uout.close()
         eflag=int(round(random.random()))
         if eflag:
-            ind1=copy_parent[0] #el mejor individuo debido su fitness
+            ind1=copy_parent[0] #best ind in the population by fitness
         else:
-            ind1=random.choice(copy_parent)
-        if mut==1 and random.random()<mutpb:#
+            ind1=random.choice(copy_parent) #random elitism
+        if mut==1 and random.random()<mutpb: #mutation
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
             offspring[0].descendents(0)
@@ -48,34 +39,24 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
                 break
 
             ind1.descendents(ind1.get_descendents()-1)
-        elif cx==1:
-            out=open('neatcx.txt','a')
-            out.write('\n ind:%s'%(ind1))
+        elif cx==1: #neat-mate
             ind_nspecie=get_specie_ind(ind1,copy_parent)
             if ind_nspecie > 1:
-                out.write('\n num_specie:%s'%(ind_nspecie))
                 ind2=[]
                 for q in range(len(copy_parent)):
                     if copy_parent[q].get_specie() == ind1.get_specie() and copy_parent[q]!=ind1:
                         ind2 = copy_parent[q]
                         break
                 if ind2==[]:
-                    try:
-                        out.write('\nelistista')
+                    try: #elitista
                         ind2=elitism_choice(ind1, copy_parent)
-                    except:
-                        #al azar
-                        out.write('\azar')
+                    except: #azar
                         ind2 = random.choice(copy_parent)
             else:
-                out.write('\naleatorio')
                 ind2 = random.choice(copy_parent)
-            out.write('\n ind2:%s'%(ind2))
             of1 = copy.deepcopy(ind1)
             of2 = copy.deepcopy(ind2)
             hijo = neatcx(of1, of2, toolbox)
-            out.write('\nhijo:%s' %(hijo))
-            out.close()
             hijo.descendents(0)
             hijo.fitness_sharing(0)
             hijo.specie(None)
@@ -103,7 +84,6 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
     return r
 
 def elitism_choice(ind, parents):
-    #species=ind_specie(parents)
     sort_par=sort_fitnessvalues(parents)
     for i in range(len(sort_par)):
         if sort_par[i]!=ind:

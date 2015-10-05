@@ -6,9 +6,6 @@ def neatcx(ind1, ind2, toolbox):
     hijo=copy.deepcopy(ind1)
     flag=0
     n=0
-    # out=open('hijos.txt','a')
-    # out.write('\ni1: %s'%(ind1))
-    # out.write('\ni2: %s'%(ind2))
     while n<10:
         e1,e2=ext_node(hijo,ind2)
         l1,l2=int_node(hijo,ind2)
@@ -31,10 +28,8 @@ def neatcx(ind1, ind2, toolbox):
                 break
         if hijo==ind1 or hijo==ind2:
             n+=1
-            # out.write('\nn++')
         else:
             break
-    #out.write('\nh1: %s'%(hijo))
     if hijo==ind1 or hijo==ind2:
         n=0
         while n<10:
@@ -43,10 +38,6 @@ def neatcx(ind1, ind2, toolbox):
                 n+=1
             else:
                 break
-        # out.write('\noff: %s'%(off))
-        # out.write('\nmutate')
-    # out.write('\nhf: %s'%(hijo))
-    # out.close()
     return hijo
 
 def int_node(ind1, ind2):
@@ -104,7 +95,6 @@ def ext_node(ind1, ind2):
     edg1=list()
     edg2=list()
     maxim=max(len(ind1), len(ind2))
-    #print 'maxim',maxim
     while (cont1<maxim) and (cont2<maxim):
         if ind1[cont1].arity==ind2[cont2].arity and ind1[cont1].arity>0:
             cont1+=1
