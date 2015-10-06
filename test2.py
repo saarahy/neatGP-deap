@@ -24,51 +24,50 @@ def mylog(x):
         return 0
     else:
         return math.log10(abs(x))
-
-pset = gp.PrimitiveSet("MAIN", 1)
-pset.addPrimitive(operator.add, 2)
-pset.addPrimitive(operator.sub, 2)
-pset.addPrimitive(operator.mul, 2)
-pset.addPrimitive(safeDiv, 2)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
-#pset.addPrimitive(math.exp,1)
-pset.addPrimitive(mylog,1)
-pset.renameArguments(ARG0='x')
-
-creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
-creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, fitness_test=creator.FitnessTest)
-
-toolbox = base.Toolbox()
-toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
-toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-toolbox.register("compile", gp.compile, pset=pset)
-
-def evalSymbReg(individual, points):
-    func = toolbox.compile(expr=individual)
-    sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
-    return math.fsum(sqerrors) / len(points),
-
-
-with open("test_x.txt") as spambase:
-    spamReader = csv.reader(spambase)
-    spam = [float(row[0]) for row in spamReader]
-with open("train_x.txt") as spamb:
-    spamReader2 = csv.reader(spamb)
-    spam2 = [float(row[0]) for row in spamReader2]
-#print spam
-#print [x/10. for x in range(-20,20)]
-
-toolbox.register("evaluate", evalSymbReg, points=spam2)
-toolbox.register("evaluate_test", evalSymbReg, points=spam)
-toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
-toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-
 def main(n_corr):
+    pset = gp.PrimitiveSet("MAIN", 1)
+    pset.addPrimitive(operator.add, 2)
+    pset.addPrimitive(operator.sub, 2)
+    pset.addPrimitive(operator.mul, 2)
+    pset.addPrimitive(safeDiv, 2)
+    pset.addPrimitive(math.cos, 1)
+    pset.addPrimitive(math.sin, 1)
+    #pset.addPrimitive(math.exp,1)
+    pset.addPrimitive(mylog,1)
+    pset.renameArguments(ARG0='x')
+
+    creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+    creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
+    creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, fitness_test=creator.FitnessTest)
+
+    toolbox = base.Toolbox()
+    toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
+    toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+    toolbox.register("compile", gp.compile, pset=pset)
+
+    def evalSymbReg(individual, points):
+        func = toolbox.compile(expr=individual)
+        sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
+        return math.fsum(sqerrors) / len(points),
+
+
+    with open("./data_corridas/problema1/corrida%d/test_x.txt" %n_corr) as spambase:
+        spamReader = csv.reader(spambase)
+        spam = [float(row[0]) for row in spamReader]
+    with open("./data_corridas/problema1/corrida%d/train_x.txt"%n_corr) as spamb:
+        spamReader2 = csv.reader(spamb)
+        spam2 = [float(row[0]) for row in spamReader2]
+
+
+    toolbox.register("evaluate", evalSymbReg, points=spam2)
+    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("mate", gp.cxOnePoint)
+    toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+
+
     pop = toolbox.population(n=500)
     hof = tools.HallOfFame(3)
 
@@ -100,7 +99,7 @@ def main(n_corr):
     return pop, log, hof
 
 if __name__ == "__main__":
-    n=0
-    while n<5:
+    n=11
+    while n<16:
         main(n)
         n+=1
