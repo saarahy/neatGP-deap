@@ -18,6 +18,11 @@ def p_selection(population):
         # a cada individuo
         for ind in population:
             ind.descendents(num_desc(ind, prom_ap_penal))
+            # ndesc=num_desc(ind, prom_ap_penal)
+            # if ndesc>(len(population)*0.10):
+            #     ind.descendents(len(population)*0.10)
+            # else:
+            #     ind.descendents(num_desc(ind, prom_ap_penal))
 
         q=population
 
