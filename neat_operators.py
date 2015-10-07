@@ -1,16 +1,8 @@
-#Variacion de los individuos
-#Aplicar lo operadores
-#los individuos padres provienen de un algoritmo
-#especial, donde se seleccionan los mejores de cada especie
-#las probabilidades de cruce y mutacion, son las mismas
-#que se manejan en todos los algoritmos.
-#n es el numero de hijos descendientes que se espera que regrese
-#la clase, este parametro podria ser omitido
 import random
 from ParentSelection import sort_fitnessvalues
 from speciation import get_specie_ind, ind_specie
 from crosspoints import *
-def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
+def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx, pelit):
     r=list()
     i=0
     copy_parent=copy.deepcopy(parents)
@@ -19,11 +11,11 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
         if n>len(copy_parent): #if the parent pool is less than the number of child
             copy_parent[:]=copy.deepcopy(parents)
 
-        eflag=int(round(random.random()))
-        if eflag:
+        eflag=int(round(random.random()))#random.random()#
+        if eflag:#<pelit:
             ind1=copy_parent[0] #best ind in the population by fitness
         else:
-            ind1=random.choice(copy_parent) #random elitism
+            ind1=random.choice(copy_parent)#random elitism
         if mut==1 and random.random()<mutpb: #mutation
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
@@ -41,7 +33,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
             ind1.descendents(ind1.get_descendents()-1)
         elif cx==1: #neat-mate
             ind_nspecie=get_specie_ind(ind1,copy_parent)
-            if ind_nspecie > 1:
+            if ind_nspecie > 1:# and eflag<pelit:
                 ind2=[]
                 for q in range(len(copy_parent)):
                     if copy_parent[q].get_specie() == ind1.get_specie() and copy_parent[q]!=ind1:
@@ -49,7 +41,10 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx):
                         break
                 if ind2==[]:
                     try: #elitista
-                        ind2=elitism_choice(ind1, copy_parent)
+                        if eflag:
+                            ind2=elitism_choice(ind1, copy_parent)
+                        else:
+                            ind2 = random.choice(copy_parent)
                     except: #azar
                         ind2 = random.choice(copy_parent)
             else:
