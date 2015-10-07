@@ -1,64 +1,8 @@
-def varAnd(population, toolbox, cxpb, mutpb):
-    """Part of an evolutionary algorithm applying only the variation part
-    (crossover **and** mutation). The modified individuals have their
-    fitness invalidated. The individuals are cloned so returned population is
-    independent of the input population.
-
-    :param population: A list of individuals to vary.
-    :param toolbox: A :class:`~deap.base.Toolbox` that contains the evolution
-                    operators.
-    :param cxpb: The probability of mating two individuals.
-    :param mutpb: The probability of mutating an individual.
-    :returns: A list of varied individuals that are independent of their
-              parents.
-
-    The variation goes as follow. First, the parental population
-    :math:`P_\mathrm{p}` is duplicated using the :meth:`toolbox.clone` method
-    and the result is put into the offspring population :math:`P_\mathrm{o}`.
-    A first loop over :math:`P_\mathrm{o}` is executed to mate consecutive
-    individuals. According to the crossover probability *cxpb*, the
-    individuals :math:`\mathbf{x}_i` and :math:`\mathbf{x}_{i+1}` are mated
-    using the :meth:`toolbox.mate` method. The resulting children
-    :math:`\mathbf{y}_i` and :math:`\mathbf{y}_{i+1}` replace their respective
-    parents in :math:`P_\mathrm{o}`. A second loop over the resulting
-    :math:`P_\mathrm{o}` is executed to mutate every individual with a
-    probability *mutpb*. When an individual is mutated it replaces its not
-    mutated version in :math:`P_\mathrm{o}`. The resulting
-    :math:`P_\mathrm{o}` is returned.
-
-    This variation is named *And* beceause of its propention to apply both
-    crossover and mutation on the individuals. Note that both operators are
-    not applied systematicaly, the resulting individuals can be generated from
-    crossover only, mutation only, crossover and mutation, and reproduction
-    according to the given probabilities. Both probabilities should be in
-    :math:`[0, 1]`.
-    """
-    offspring = [toolbox.clone(ind) for ind in population]
-
-    # Apply crossover and mutation on the offspring
-    for i in range(1, len(offspring), 2):
-        if random.random() < cxpb:
-            offspring[i-1], offspring[i] = toolbox.mate(offspring[i-1], offspring[i])
-            del offspring[i-1].fitness.values, offspring[i].fitness.values
-            offspring[i-1].descendents(0), offspring[i].descendents(0)
-            offspring[i-1].fitness_sharing(0), offspring[i].fitness_sharing(0)
-            offspring[i-1].specie(None), offspring[i].specie(None)
-
-    for i in range(len(offspring)):
-        if random.random() < mutpb:
-            offspring[i], = toolbox.mutate(offspring[i])
-            del offspring[i].fitness.values
-            offspring[i].descendents(0)
-            offspring[i].fitness_sharing(0)
-            offspring[i].specie(None)
-
-    return offspring
-
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,stats=None,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, params,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
-
+    
     :param population: A list of individuals.
     :param toolbox: A :class:`~deap.base.Toolbox` that contains the evolution
                     operators.
@@ -81,7 +25,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,
                        contain the best individuals, optional.
     :param verbose: Whether or not to log the statistics.
     :returns: The final population.
-
+    
     It uses :math:`\lambda = \kappa = \mu` and goes as follow.
     It first initializes the population (:math:`P(0)`) by evaluating
     every individual presenting an invalid fitness. Then, it enters the
@@ -89,12 +33,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,
     population. Then the crossover operator is applied on a proportion of
     :math:`P(g+1)` according to the *cxpb* probability, the resulting and the
     untouched individuals are placed in :math:`P'(g+1)`. Thereafter, a
-    proportion of :math:`P'(g+1)`, determined by *mutpb*, is
+    proportion of :math:`P'(g+1)`, determined by *mutpb*, is 
     mutated and placed in :math:`P''(g+1)`, the untouched individuals are
     transferred :math:`P''(g+1)`. Finally, those new individuals are evaluated
     and the evolution loop continues until *ngen* generations are completed.
     Briefly, the operators are applied in the following order ::
-
+    
         evaluate(population)
         for i in range(ngen):
             offspring = select(population)
@@ -102,11 +46,11 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,
             offspring = mutate(offspring)
             evaluate(offspring)
             population = offspring
-
+    
     This function expects :meth:`toolbox.mate`, :meth:`toolbox.mutate`,
     :meth:`toolbox.select` and :meth:`toolbox.evaluate` aliases to be
     registered in the toolbox.
-
+    
     .. [Back2000] Back, Fogel and Michalewicz, "Evolutionary Computation 1 :
        Basic Algorithms and Operators", 2000.
     """
@@ -185,7 +129,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,
             n=len(parents)
             mut=1
             cx=1
-            offspring=neatGP(toolbox,parents,cxpb,mutpb,n,mut,cx)
+            offspring=neatGP(toolbox,parents,cxpb,mutpb,n,mut,cx,pelit)
         else:
             offspring = varAnd(parents, toolbox, cxpb, mutpb)
 
@@ -240,12 +184,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,n_corr, params,
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
             halloffame.update(offspring)
-
+            
         # Replace the current population by the offspring
         #the best offsprings in R replace the pworst% individual
         #of the population P
         population[:] = offspring
-
+        
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
