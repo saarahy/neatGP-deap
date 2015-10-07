@@ -55,6 +55,7 @@ def set_numind(ind,species):
 #revisa si algun individuo de la poblacion
 #se encuentra sin especie y le asigna una
 def species(population, h):
+    num_specie=count_species(population)
     for ind in population:
         if ind.get_specie()==None:
             if (len(ind)==1):
@@ -66,8 +67,8 @@ def species(population, h):
                         ind.specie(ind1.get_specie())
                         break
             if ind.get_specie()==None:
-                num_specie=count_species(population)
                 ind.specie(num_specie+1)
+                num_specie+=1
     return population
 
 #asignar la especie de un individuo especifico
@@ -87,6 +88,7 @@ def specie_ind(population,ind, h):
 
 #asignar especies de padres a hijos
 def specie_parents_child(parents, offspring, h):
+    n_esp=count_species(parents)
     for ind in offspring:
         if ind.get_specie()==None:
             if (len(ind)==1):
@@ -98,11 +100,11 @@ def specie_parents_child(parents, offspring, h):
                         ind.specie(parent.get_specie())
                         break
             if ind.get_specie()==None:
-                num_specie=count_species(parents)
-                ind.specie(num_specie+1)
-                parents.append(ind)
-                offspring.remove(ind)
-    return parents
+                ind.specie(n_esp+1)
+                n_esp+=1
+                #parents.append(ind)
+                #offspring.remove(ind)
+    return offspring#parents
 
 
 

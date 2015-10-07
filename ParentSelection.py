@@ -12,7 +12,7 @@ def p_selection(population):
 
         #penalizar al promedio
         if prom_ap_penal>10:
-            prom_ap_penal=10
+            prom_ap_penal=1
 
         #conseguimos y aplicamos el num. de desc.
         # a cada individuo

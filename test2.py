@@ -48,7 +48,7 @@ def evalSymbReg(individual, points):
     sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
     return math.fsum(sqerrors) / len(points),
 
-def main(n_corr):
+def main(n_corr, p):
 
     with open("./data_corridas/problema1/corrida%d/test_x.txt" %n_corr) as spambase:
         spamReader = csv.reader(spambase)
@@ -81,7 +81,7 @@ def main(n_corr):
     neatcx=True
     alg=True
     pelit=0.5
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100,alg,neatcx,0.15,pelit,n_corr,params,stats=mstats,halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,alg,neatcx,0.15,pelit,n_corr,params,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d.txt'%n_corr, 'w')
 
@@ -99,7 +99,7 @@ def main(n_corr):
 if __name__ == "__main__":
     n=1
     p=1
-    while n<31 and p<3:
+    while n<2 and p<2:
         main(n, p)
         n+=1
         if n==30:
