@@ -60,15 +60,15 @@ def species(population, h):
         if ind.get_specie()==None:
             if (len(ind)==1):
                 ind.specie(1)
-                break
-            for ind1 in population:
-                if ind1.get_specie()!=None:
-                    if distance(ind,ind1)<=h:
-                        ind.specie(ind1.get_specie())
-                        break
-            if ind.get_specie()==None:
-                ind.specie(num_specie+1)
-                num_specie+=1
+            else:
+                for ind1 in population:
+                    if ind1.get_specie()!=None:
+                        if distance(ind,ind1)<=h:
+                            ind.specie(ind1.get_specie())
+                            break
+                if ind.get_specie()==None:
+                    ind.specie(num_specie+1)
+                    num_specie+=1
     return population
 
 #asignar la especie de un individuo especifico
@@ -93,17 +93,17 @@ def specie_parents_child(parents, offspring, h):
         if ind.get_specie()==None:
             if (len(ind)==1):
                 ind.specie(1)
-                break
-            for parent in parents:
-                if parent.get_specie()!=None:
-                    if distance(ind, parent)<=h:
-                        ind.specie(parent.get_specie())
-                        break
-            if ind.get_specie()==None:
-                ind.specie(n_esp+1)
-                n_esp+=1
-                #parents.append(ind)
-                #offspring.remove(ind)
+            else:
+                for parent in parents:
+                    if parent.get_specie()!=None:
+                        if distance(ind, parent)<=h:
+                            ind.specie(parent.get_specie())
+                            break
+                if ind.get_specie()==None:
+                    ind.specie(n_esp+1)
+                    n_esp+=1
+                    #parents.append(ind)
+                    #offspring.remove(ind)
     return offspring#parents
 
 

@@ -15,7 +15,6 @@ def SpeciesPunishment(population,params,h):
         if protect=='yes':
             if ind.get_specie()==None or ind.get_specie()==0:
                 specie_ind(population,ind,h)
-                #ind.specie(1)
                 ind.penalty(True)
                 ind.fitness_sharing(ind.fitness.values[0])
             #else:
@@ -87,6 +86,7 @@ def SpeciesPunishment(population,params,h):
                                 level_mejor=ind.height
                     lst=list(ind.fitness.values)
                     lst[0]=ind.get_fsharing()
+                    ind.fitness_sharing(ind.fitness.values[0])
                     ind.fitness.values=tuple(lst)
                 if contador==e[1]:
                     break
