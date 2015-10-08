@@ -4,7 +4,7 @@ from speciation import *
 #debe de recibir de entrada el parametro de
     #survival_thershold=0.5
 
-def p_selection(population):
+def p_selection(population,ngen):
         #provisional
         survival=0.5
         #sacar promedio para penalizar
@@ -12,17 +12,17 @@ def p_selection(population):
 
         #penalizar al promedio
         if prom_ap_penal>10:
-            prom_ap_penal=1
+            prom_ap_penal=10
 
         #conseguimos y aplicamos el num. de desc.
         # a cada individuo
         for ind in population:
-            ind.descendents(num_desc(ind, prom_ap_penal))
-            # ndesc=num_desc(ind, prom_ap_penal)
-            # if ndesc>(len(population)*0.10):
-            #     ind.descendents(len(population)*0.10)
-            # else:
-            #     ind.descendents(num_desc(ind, prom_ap_penal))
+            #ind.descendents(num_desc(ind, prom_ap_penal))
+            ndesc=num_desc(ind, prom_ap_penal)
+            if ndesc>(len(population)*0.10):
+                ind.descendents(len(population)*0.10)
+            else:
+                ind.descendents(num_desc(ind, prom_ap_penal))
 
         q=population
 
@@ -41,18 +41,17 @@ def p_selection(population):
                     contador+=1
                     gpo_specie.append(ind)
                 if contador==e[1]:
-                    #parents.append(eliminar_ind(gpo_specie,survival))
                     parents.append(penalizar_ind(gpo_specie,survival))
                     gpo_specie=list()
                     contador=0
         for especie in parents:
             for ind in especie:
-                gparents.append([ind, ind.fitness.values, ind.get_fsharing(), ind.get_descendents()])
+                gparents.append([ind,ind.fitness.values, ind.get_fsharing(), ind.get_descendents(), ind.get_specie()])
         gsparents=sorted(gparents, key=lambda ind:(ind[1], ind[2]))
-        # out=open('gsparents.txt','a')
-        # for ind in gsparents:
-        #     out.write('\n  %s;%s;%s;%s' %(ind[1], ind[2], ind[3], ind[0]))
-        # out.close()
+        out=open('gsparents.txt','a')
+        for ind in gsparents:
+            out.write('\n%s;%s;%s;%s;%s;%s' %(ngen,ind[1], ind[2], ind[3],ind[4], ind[0]))
+        out.close()
         gparents=list()
         indice=int(round(len(gsparents)-(len(gsparents)*survival)))
         for ind in range(indice):
@@ -60,8 +59,8 @@ def p_selection(population):
         return gparents
 
 def num_desc(ind, avg):
-    int1=list(ind.fitness.values)
-    int1=float(int1[0])
+    int1=ind.get_fsharing()#list(ind.fitness.values)#ind.get_fsharing()
+    #int1=float(int1[0])
     if int1==0.0:
         int1=1
     numd=round(avg/int1)
@@ -70,8 +69,8 @@ def num_desc(ind, avg):
 def avg(population):
     suma=0
     for ind in population:
-        int1=list(ind.fitness.values)
-        suma+=int1[0]
+        #int1=list(ind.fitness.values)
+        suma+=ind.get_fsharing()#int1[0]
     promedio=suma/len(population)
     return promedio
 
