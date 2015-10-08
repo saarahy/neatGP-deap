@@ -104,10 +104,11 @@ def penalizar_ind(gpo_specie, survival):
     indice=int(round(len(sort_gpo)-(len(sort_gpo)*survival)))
     #reverse_gpo=sorted(sort_gpo, key=lambda ind:ind[1],reverse=True)
     reverse_gpo=sort_gpo
-    for i in range(indice):
-        reverse_gpo[i][0].fitness.values=999999999.00,
-        reverse_gpo[i][1]=999999999.00
-        reverse_gpo[i][2]=999999999.00
+    if len(reverse_gpo)>1:
+        for i in range(indice):
+            reverse_gpo[i][0].fitness.values=999999999.00,
+            reverse_gpo[i][1]=999999999.00
+            reverse_gpo[i][2]=999999999.00
     sort_gpo=sorted(reverse_gpo, key=lambda ind:ind[1])
     parnt=list()
     for i in range(len(sort_gpo)):
