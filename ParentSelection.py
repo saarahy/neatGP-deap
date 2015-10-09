@@ -22,7 +22,7 @@ def p_selection(population,ngen):
             if ndesc>(len(population)*0.10):
                 ind.descendents(len(population)*0.10)
             else:
-                ind.descendents(num_desc(ind, prom_ap_penal))
+                ind.descendents(ndesc)
 
         q=population
 
@@ -48,10 +48,10 @@ def p_selection(population,ngen):
             for ind in especie:
                 gparents.append([ind,ind.fitness.values, ind.get_fsharing(), ind.get_descendents(), ind.get_specie()])
         gsparents=sorted(gparents, key=lambda ind:(ind[1], ind[2]))
-        out=open('gsparents.txt','a')
-        for ind in gsparents:
-            out.write('\n%s;%s;%s;%s;%s;%s' %(ngen,ind[1], ind[2], ind[3],ind[4], ind[0]))
-        out.close()
+        # out=open('gsparents.txt','a')
+        # for ind in gsparents:
+        #     out.write('\n%s;%s;%s;%s;%s;%s' %(ngen,ind[1], ind[2], ind[3],ind[4], ind[0]))
+        # out.close()
         gparents=list()
         indice=int(round(len(gsparents)-(len(gsparents)*survival)))
         for ind in range(indice):

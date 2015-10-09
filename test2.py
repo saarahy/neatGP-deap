@@ -66,7 +66,7 @@ def main(n_corr, p):
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=500)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -80,8 +80,8 @@ def main(n_corr, p):
     params=['best_of_each_specie',2,'yes']
     neatcx=True
     alg=True
-    pelit=0.5
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 50,alg,neatcx,0.15,pelit,n_corr,params,stats=mstats,halloffame=hof, verbose=True)
+    pelit=0.6
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100,alg,neatcx,0.15,pelit,n_corr,params,stats=mstats,halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d.txt'%n_corr, 'w')
 
@@ -99,7 +99,7 @@ def main(n_corr, p):
 if __name__ == "__main__":
     n=1
     p=1
-    while n<2 and p<2:
+    while n<6 and p<2:
         main(n, p)
         n+=1
         if n==30:
