@@ -3,7 +3,7 @@ import math
 import random
 import csv
 import numpy
-
+from decimal import Decimal
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -92,7 +92,10 @@ def evalSymbRegKorns(individual, points):
     func = toolbox.compile(expr=individual)
     sqerrors=[]
     for elem in range(len(points[0])):
-        sqerrors.append((func(float(points[0][elem]), float(points[0][elem])) - (2.0-(2.1 * (math.cos(9.8 * float(points[0][elem]))*math.sin(1.3 *float(points[4][elem]))))))**2)
+        try:
+            sqerrors.append((func(float(points[0][elem]), float(points[4][elem]))-(2.0-(2.1 * (math.cos(9.8 * float(points[0][elem]))*math.sin(1.3 *float(points[4][elem]))))))**2)
+        except:
+            sqerrors.append((Decimal(func(float(points[0][elem]), float(points[0][elem])))-(Decimal(2.0)-(Decimal(2.1) * (Decimal(math.cos(Decimal(9.8) * Decimal(points[0][elem])))*Decimal(math.sin(Decimal(1.3) *Decimal(points[4][elem])))))))**2)
     return math.fsum(sqerrors) / len(points[0]),
 
 
@@ -112,21 +115,21 @@ def Korns(n_corr):
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
         Matrix=[[],[],[],[],[]]
         for row in spamReader:
-            Matrix[0].append(float(row[0]))
-            Matrix[1].append(float(row[1]))
-            Matrix[2].append(float(row[2]))
-            Matrix[3].append(float(row[3]))
-            Matrix[4].append(float(row[4]))
+            Matrix[0].append(Decimal(row[0]))
+            Matrix[1].append(Decimal(row[1]))
+            Matrix[2].append(Decimal(row[2]))
+            Matrix[3].append(Decimal(row[3]))
+            Matrix[4].append(Decimal(row[4]))
         spam=Matrix
     with open("./data_corridas/Korns/corrida%d/train_x.txt"%n_corr) as spamb:
         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
         Matrix=[[],[],[],[],[]]
         for row in spamReader2:
-            Matrix[0].append(float(row[0]))
-            Matrix[1].append(float(row[1]))
-            Matrix[2].append(float(row[2]))
-            Matrix[3].append(float(row[3]))
-            Matrix[4].append(float(row[4]))
+            Matrix[0].append(Decimal(row[0]))
+            Matrix[1].append(Decimal(row[1]))
+            Matrix[2].append(Decimal(row[2]))
+            Matrix[3].append(Decimal(row[3]))
+            Matrix[4].append(Decimal(row[4]))
         spam2=Matrix
     toolbox.register("evaluate", evalSymbRegKorns, points=spam2)
     toolbox.register("evaluate_test", evalSymbRegKorns, points=spam)
@@ -142,7 +145,6 @@ def main(n_corr, p):
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-
 
     pop = toolbox.population(n=500)
     hof = tools.HallOfFame(3)
@@ -177,9 +179,9 @@ def main(n_corr, p):
 if __name__ == "__main__":
     n = 1
     p = 2
-    while n < 2 and p < 3:
+    while n < 31 and p < 3:
         main(n, p)
         n += 1
-        if n == 30:
+        if n == 31:
             n = 1
             p += 1
