@@ -49,6 +49,8 @@ def mypower3(x):
     else:
         return y
 
+
+
 pset = gp.PrimitiveSet("MAIN", 2)
 pset.addPrimitive(operator.add, 2)  # Koza, Korns
 pset.addPrimitive(operator.sub, 2)  # Koza, Korns
@@ -65,7 +67,6 @@ pset.addPrimitive(math.tan, 1)  # Koza, Korns
 pset.addPrimitive(math.tanh, 1)  # Koza, Korns
 pset.addEphemeralConstant("rand101",lambda: random.uniform(-1, 1))  # Korns
 #pset.renameArguments(ARG0='x')  # Koza
-
 pset.renameArguments(ARG0='x0')  # Korns
 pset.renameArguments(ARG1='x1')  # Korns
 pset.renameArguments(ARG2='x2')  # Korns
@@ -83,11 +84,6 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
-def evalSymbReg(individual, points):
-    func = toolbox.compile(expr=individual)
-    sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
-    return math.fsum(sqerrors) / len(points),
-
 def evalSymbRegKorns(individual, points):
     func = toolbox.compile(expr=individual)
     sqerrors=[]
@@ -98,16 +94,6 @@ def evalSymbRegKorns(individual, points):
             sqerrors.append((Decimal(func(float(points[0][elem]), float(points[0][elem])))-(Decimal(2.0)-(Decimal(2.1) * (Decimal(math.cos(Decimal(9.8) * Decimal(points[0][elem])))*Decimal(math.sin(Decimal(1.3) *Decimal(points[4][elem])))))))**2)
     return math.fsum(sqerrors) / len(points[0]),
 
-
-def Koza(n_corr):
-    with open("./data_corridas/Koza/corrida%d/test_x.txt" %n_corr) as spambase:
-        spamReader = csv.reader(spambase)
-        spam = [float(row[0]) for row in spamReader]
-    with open("./data_corridas/Koza/corrida%d/train_x.txt"%n_corr) as spamb:
-        spamReader2 = csv.reader(spamb)
-        spam2 = [float(row[0]) for row in spamReader2]
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def Korns(n_corr):
@@ -135,24 +121,21 @@ def Korns(n_corr):
     toolbox.register("evaluate_test", evalSymbRegKorns, points=spam)
 
 
-def main(n_corr, p):
-    p = {
-        1: Koza(n_corr),
-        2: Korns(n_corr),
-    }
+def main(n_corr):
+    Korns(n_corr)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
     stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
-    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test= stats_fit_test)
+    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
@@ -176,12 +159,16 @@ def main(n_corr, p):
     outfile.close()
     return pop, log, hof
 
+
+def run(number):
+    n = 1
+    while n <= number:
+        main(n)
+        n += 1
+
+
 if __name__ == "__main__":
     n = 1
-    p = 2
-    while n < 31 and p < 3:
-        main(n, p)
+    while n < 3:
+        main(n)
         n += 1
-        if n == 31:
-            n = 1
-            p += 1
