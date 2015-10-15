@@ -11,57 +11,21 @@ from deap import tools
 from deap import gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
-
-
-def safe_div(left, right):
-    try:
-        return left / right
-    except ZeroDivisionError:
-        return 0
-
-
-def mylog(x):
-    if x==0:
-        return 0
-    else:
-        return math.log10(abs(x))
-
-
-def mysqrt(x):
-    if x<=0:
-        return 0
-    else:
-        return math.sqrt(x)
-
-
-def mypower2(x):
-    y=math.pow(x,2)
-    if isinstance(y,complex) or math.isinf(y) or math.isnan(y):
-        return 0
-    else:
-        return y
-
-
-def mypower3(x):
-    y=math.pow(x,3)
-    if isinstance(y,complex) or math.isinf(y) or math.isnan(y):
-        return 0
-    else:
-        return y
+from my_operators import safe_div, mylog
 
 
 pset = gp.PrimitiveSet("MAIN", 1)
-pset.addPrimitive(operator.add, 2)  # Koza, Korns
-pset.addPrimitive(operator.sub, 2)  # Koza, Korns
-pset.addPrimitive(operator.mul, 2)  # Koza, Korns
-pset.addPrimitive(safe_div, 2)  # Koza, Korns
-pset.addPrimitive(math.cos, 1)  # Koza, Korns
-pset.addPrimitive(math.sin, 1)  # Koza, Korns
-#pset.addPrimitive(math.exp,1)  # Koza Korns
-pset.addPrimitive(mylog,1)  # Koza, Korns
-pset.addPrimitive(math.tan, 1)  # Koza, Korns
-pset.addPrimitive(math.tanh, 1)  # Koza, Korns
-pset.renameArguments(ARG0='x')  # Koza
+pset.addPrimitive(operator.add, 2)
+pset.addPrimitive(operator.sub, 2)
+pset.addPrimitive(operator.mul, 2)
+pset.addPrimitive(safe_div, 2)
+pset.addPrimitive(math.cos, 1)
+pset.addPrimitive(math.sin, 1)
+#pset.addPrimitive(math.exp,1)
+pset.addPrimitive(mylog,1)
+pset.addPrimitive(math.tan, 1)
+pset.addPrimitive(math.tanh, 1)
+pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
@@ -81,7 +45,7 @@ def evalSymbReg(individual, points):
 
 
 def Nguyen7(n_corr):
-    with open("./data_corridas/Nguyen7/corrida%d/test_x.txt" %n_corr) as spambase:
+    with open("./data_corridas/Nguyen7/corrida%d/test_x.txt" % n_corr) as spambase:
         spamReader = csv.reader(spambase)
         spam = [float(row[0]) for row in spamReader]
     with open("./data_corridas/Nguyen7/corrida%d/train_x.txt"%n_corr) as spamb:
@@ -105,18 +69,18 @@ def main(n_corr, p):
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
     stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
-    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test= stats_fit_test)
+    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
-    alg = True
+    neat = True
     pelit = 0.6
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, alg, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
-    outfile = open('popfinal_%d_%d.txt'%(p,n_corr), 'w')
+    outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
     outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
@@ -139,6 +103,6 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 3:
-        main(n)
+    while n < 30:
+        main(n, 4)
         n += 1

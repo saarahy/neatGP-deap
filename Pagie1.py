@@ -11,53 +11,7 @@ from deap import tools
 from deap import gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
-
-
-def safe_div(left, right):
-    try:
-        return left / right
-    except ZeroDivisionError:
-        return 0.0
-
-
-def mylog(x):
-    if x==0:
-        return 0.0
-    else:
-        return math.log10(abs(x))
-
-
-def mysqrt(x):
-    if x<=0.0:
-        return 0.0
-    else:
-        return math.sqrt(x)
-
-
-def mypower2(x):
-    y=math.pow(x,2)
-    if isinstance(y,complex) or math.isinf(y) or math.isnan(y):
-        return 0.0
-    else:
-        return y
-
-
-def mypower3(x):
-    y=math.pow(x,3)
-    if isinstance(y,complex) or math.isinf(y) or math.isnan(y):
-        return 0.0
-    else:
-        return y
-
-
-def negative(x):
-    return -x
-
-def undivide(x):
-    if x==0:
-        return 1.0
-    else:
-        return 1.0/x
+from my_operators import safe_div, mylog
 
 
 pset = gp.PrimitiveSet("MAIN", 2)
@@ -86,21 +40,21 @@ def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
     sqerrors=[]
     for elem in range(len(points[0])):
-        sqerrors.append((func(points[0][elem],points[1][elem])-((1/(1+points[0][elem]**-4))+(1/(1+points[1][elem]**-4))))**2)
+        sqerrors.append((func(points[0][elem], points[1][elem])-((1/(1+points[0][elem]**-4))+(1/(1+points[1][elem]**-4))))**2)
     return math.fsum(sqerrors) / len(points),
 
 
 def Pagie1(n_corr):
-    with open("./data_corridas/Pagie1/corrida%d/test_x.txt" %n_corr) as spambase:
+    with open("./data_corridas/Pagie1/corrida%d/test_x.txt" % n_corr) as spambase:
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
-        Matrix=[[],[]]
+        Matrix = [[], []]
         for row in spamReader:
             Matrix[0].append(float(row[0]))
             Matrix[1].append(float(row[1]))
         spam = Matrix
     with open("./data_corridas/Pagie1/corrida%d/train_x.txt"%n_corr) as spamb:
         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
-        Matrix=[[],[]]
+        Matrix = [[], []]
         for row in spamReader2:
             Matrix[0].append(float(row[0]))
             Matrix[1].append(float(row[1]))
@@ -122,19 +76,19 @@ def main(n_corr, p):
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
-    stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
-    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test= stats_fit_test)
+    stats_fit_test = tools.Statistics(lambda i: i.fitness_test.values)
+    mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size, fitness_test=stats_fit_test)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
-    alg = True
+    neat = True
     pelit = 0.6
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, alg, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
-    outfile = open('popfinal_%d_%d.txt'%(p,n_corr), 'w')
+    outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
     outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
@@ -157,7 +111,7 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 3:
+    while n < 30:
         main(n, 8)
         n += 1
 
