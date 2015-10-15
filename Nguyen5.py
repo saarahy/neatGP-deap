@@ -131,14 +131,14 @@ def main(n_corr, p):
 
 
 def run(number, problem):
-    n = 15
+    n = 1
     while n <= number:
         main(n, problem)
         n += 1
 
 
 if __name__ == "__main__":
-    n = 1
-    while n < 3:
-        main(n)
+    n = 14
+    while n <= 14:
+        main(n,3)
         n += 1
