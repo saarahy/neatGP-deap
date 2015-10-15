@@ -13,7 +13,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_cor
     :param neat: wheter or not to use neatGP
     :param neatcx: wheter or not to use neat-crossover
     :param h: indicate the distance allowed between each specie
-    :param pelit: indicate the distance allowed between each specie
+    :param pelit: indicate the probability of being random-elitist
     :param n_corr: indicate the number of run
     :param problem: indicate the number of problem that you are running (menu)
     :param params:indicate the params for the fitness sharing, the diffetent
@@ -76,7 +76,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_cor
         ind.fitness_test.values = fit_test
 
     if neat:
-        SpeciesPunishment(population,params,h)
+        SpeciesPunishment(population, params, h)
 
     if halloffame is not None:
         halloffame.update(population)
@@ -100,7 +100,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_cor
             n = len(parents)
             mut = 1  # 1. Activate mutation - Otherwise. Deactivate mutaction
             cx = 1  # 1. Activate crossover - Otherwise. Deactivate crossover
-            offspring = neatGP(toolbox,parents,cxpb,mutpb,n,mut,cx,pelit)
+            offspring = neatGP(toolbox, parents, cxpb, mutpb, n, mut, cx, pelit)
         else:
             offspring = varAnd(parents, toolbox, cxpb, mutpb)
 
@@ -121,7 +121,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_cor
             ind.fitness_test.values = fit_test
 
         if neat:
-            SpeciesPunishment(offspring,params,h)
+            SpeciesPunishment(offspring, params, h)
 
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
@@ -138,11 +138,11 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_cor
         if verbose:
             print logbook.stream
         if neat:
-            out = open('popgen_%d_%d.txt'%(p,n_corr),'a')
+            out = open('popgen_%d_%d.txt' % (problem, n_corr), 'a')
             for ind in population:
-                out.write('\n%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.fitness.values, ind.get_fsharing(), ind))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s' % (gen, len(ind), ind.height, ind.get_specie(), ind.fitness.values, ind.get_fsharing(), ind))
         else:
-            out = open('popgen_%d_%d.txt'%(p,n_corr),'a')
+            out = open('popgen_%d_%d.txt' % (problem, n_corr), 'a')
             for ind in population:
                 out.write('\n%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.fitness.values, ind))
 
