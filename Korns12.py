@@ -121,7 +121,7 @@ def Korns(n_corr):
     toolbox.register("evaluate_test", evalSymbRegKorns, points=spam)
 
 
-def main(n_corr):
+def main(n_corr, p):
     Korns(n_corr)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -144,9 +144,9 @@ def main(n_corr):
     neatcx = True
     alg = True
     pelit = 0.6
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, alg, neatcx, 0.15, pelit, n_corr, params, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, alg, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
-    outfile = open('popfinal_%d.txt'%n_corr, 'w')
+    outfile = open('popfinal_%d_%d.txt'%(p,n_corr), 'w')
 
     outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
     outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
@@ -160,7 +160,7 @@ def main(n_corr):
     return pop, log, hof
 
 
-def run(number):
+def run(number,problem):
     n = 1
     while n <= number:
         main(n)
