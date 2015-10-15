@@ -1,8 +1,8 @@
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, params,stats=None,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg, neat, h,pelit,n_corr, p, params,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
-    
+
     :param population: A list of individuals.
     :param toolbox: A :class:`~deap.base.Toolbox` that contains the evolution
                     operators.
@@ -25,7 +25,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
                        contain the best individuals, optional.
     :param verbose: Whether or not to log the statistics.
     :returns: The final population.
-    
+
     It uses :math:`\lambda = \kappa = \mu` and goes as follow.
     It first initializes the population (:math:`P(0)`) by evaluating
     every individual presenting an invalid fitness. Then, it enters the
@@ -33,12 +33,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
     population. Then the crossover operator is applied on a proportion of
     :math:`P(g+1)` according to the *cxpb* probability, the resulting and the
     untouched individuals are placed in :math:`P'(g+1)`. Thereafter, a
-    proportion of :math:`P'(g+1)`, determined by *mutpb*, is 
+    proportion of :math:`P'(g+1)`, determined by *mutpb*, is
     mutated and placed in :math:`P''(g+1)`, the untouched individuals are
     transferred :math:`P''(g+1)`. Finally, those new individuals are evaluated
     and the evolution loop continues until *ngen* generations are completed.
     Briefly, the operators are applied in the following order ::
-    
+
         evaluate(population)
         for i in range(ngen):
             offspring = select(population)
@@ -46,11 +46,11 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
             offspring = mutate(offspring)
             evaluate(offspring)
             population = offspring
-    
+
     This function expects :meth:`toolbox.mate`, :meth:`toolbox.mutate`,
     :meth:`toolbox.select` and :meth:`toolbox.evaluate` aliases to be
     registered in the toolbox.
-    
+
     .. [Back2000] Back, Fogel and Michalewicz, "Evolutionary Computation 1 :
        Basic Algorithms and Operators", 2000.
     """
@@ -114,13 +114,13 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
         # out.close()
         # Select the next generation individuals
         if alg:
-            parents=p_selection(population)
+            parents=p_selection(population, gen)
         else:
             offspring = toolbox.select(population, len(population))
 
         # out=open('parents.txt','a')
         # for ind in parents:
-        #     out.write('\n  %s %s %s %s %s %s %s' %(gen,len(ind), ind.height, ind.get_specie(), ind.fitness.values, ind.get_fsharing(), ind))
+        #     out.write('\n%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.get_descendents(),ind.fitness.values, ind.get_fsharing(), ind))
         # out.close()
         # Vary the pool of individuals
         #here will be evaluated the parents pool with
@@ -147,6 +147,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
             specie_parents_child(parents,offspring,h)
             #asigna a cada individuo de la poblacion, el numero de individuos
             #dentro de su misma especie
+            # out=open('aftneat.txt','a')
+            # for ind in offspring:
+            #     out.write('\n%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(),  ind.get_fsharing(), ind))
+            # out.close()
             offspring[:]=parents+offspring
             ind_specie(offspring)
 
@@ -184,19 +188,19 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, alg,neat, h,pelit,n_corr, p
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
             halloffame.update(offspring)
-            
+
         # Replace the current population by the offspring
         #the best offsprings in R replace the pworst% individual
         #of the population P
         population[:] = offspring
-        
+
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
             print logbook.stream
 
-        out=open('popgen_%d.txt'%n_corr,'a')
+        out=open('popgen_%d_%d.txt'%(p,n_corr),'a')
         for ind in population:
             out.write('\n%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.fitness.values, ind.get_fsharing(), ind))
 
