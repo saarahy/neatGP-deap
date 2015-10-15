@@ -18,18 +18,18 @@ def initRepeat(container, func, n):
 
     See the :ref:`list-of-floats` and :ref:`population` tutorials for more examples.
     """
-    if container==list:
-        pop=[]
+    if container == list:  # This code is to eliminate twins at initial population
+        pop = []
         for x in xrange(n):
-            n=0
-            while n<30:
-                ind=func()
+            n = 0
+            while n < 20:
+                ind = func()
                 if ind in pop:
-                    n+=1
+                    n += 1
                 else:
                     pop.append(ind)
                     break
-        container=pop
+        container = pop
         return container
     else:
         return container(func() for _ in xrange(n))
