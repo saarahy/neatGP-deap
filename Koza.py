@@ -74,9 +74,9 @@ def main(n_corr, p):
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     params = ['best_of_each_specie', 2, 'yes']
-    neatcx = False
-    neat = False
-    pelit = 0.6
+    neatcx = True
+    neat = True
+    pelit = 0.5
     pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
