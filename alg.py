@@ -1,3 +1,10 @@
+#add this imports
+from measure_tree import *
+from neat_operators import *
+from speciation import *
+from fitness_sharing import *
+from ParentSelection import *
+
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat, neatcx, h,pelit,n_corr, problem, params,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
