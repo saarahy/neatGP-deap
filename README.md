@@ -10,9 +10,9 @@ The previous software that you'll need are: </br>
 </br>
 </br>
 Once that you've download it, you have to modify a little bit the next two files:</br>
--algorithms.py (deap): you have to modify the function eaSimple, the code that you have to put is in the file alg.py</br>
--init.py (deap): you have to modify the function initRepeat, the code is in the file init_conf.py </br>
-
-And that's all.
-If you have a problem please contact me: pjuarez@tree-lab.org
+<b>-algorithms.py (deap)</b>: you have to modify the function eaSimple, the code that you have to put is in the file alg.py and import the modules.</br>
+<b>-init.py (deap)</b>: you have to modify the function initRepeat, the code is in the file init_conf.py </br>
+<b>-gp.py (deap)</b>: you have to import the modules and add the attributes on the init function. On the PrimitiveTree Class just add the parameter neat.<br>
+And that's all. <br>
+If you have a problem please contact me: pjuarez@tree-lab.org <br>
 Regards!
