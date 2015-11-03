@@ -2,7 +2,7 @@ import operator
 import math
 import random
 import csv
-import numpy
+import numpy as np
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -57,25 +57,25 @@ def evalSymbRegKorns(individual, points):
 
 
 def Korns(n_corr):
-    with open("./data_corridas/Korns/corrida%d/test_x.txt" % n_corr) as spambase:
+    direccion="./data_corridas/Korns/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Korns/corrida%d/train_x.txt"
+    with open(direccion% n_corr) as spambase:
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], [], [], [], []]
-        for row in spamReader:
-            Matrix[0].append(Decimal(row[0]))
-            Matrix[1].append(Decimal(row[1]))
-            Matrix[2].append(Decimal(row[2]))
-            Matrix[3].append(Decimal(row[3]))
-            Matrix[4].append(Decimal(row[4]))
+        num_c = sum(1 for line in open(direccion % n_corr))
+        num_r = len(next(csv.reader(open(direccion % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix = np.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                Matrix[r, c] = row[r]
         spam = Matrix
-    with open("./data_corridas/Korns/corrida%d/train_x.txt" % n_corr) as spamb:
+    with open(direccion2 % n_corr) as spamb:
         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], [], [], [], []]
-        for row in spamReader2:
-            Matrix[0].append(Decimal(row[0]))
-            Matrix[1].append(Decimal(row[1]))
-            Matrix[2].append(Decimal(row[2]))
-            Matrix[3].append(Decimal(row[3]))
-            Matrix[4].append(Decimal(row[4]))
+        num_c = sum(1 for line in open(direccion2 % n_corr))
+        num_r = len(next(csv.reader(open(direccion2 % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix = np.empty((num_r, num_c,))
+        for row, c in zip(spamReader2, range(num_c)):
+            for r in range(num_r):
+                Matrix[r, c] = row[r]
         spam2 = Matrix
     toolbox.register("evaluate", evalSymbRegKorns, points=spam2)
     toolbox.register("evaluate_test", evalSymbRegKorns, points=spam)
@@ -96,10 +96,10 @@ def main(n_corr, p):
     stats_size = tools.Statistics(len)
     stats_fit_test = tools.Statistics(lambda i: i.fitness_test.values)
     mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
-    mstats.register("avg", numpy.mean)
-    mstats.register("std", numpy.std)
-    mstats.register("min", numpy.min)
-    mstats.register("max", numpy.max)
+    mstats.register("avg", np.mean)
+    mstats.register("std", np.std)
+    mstats.register("min", np.min)
+    mstats.register("max", np.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
     neat = True

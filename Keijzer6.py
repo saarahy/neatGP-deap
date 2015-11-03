@@ -88,7 +88,8 @@ def main(n_corr,p):
 
     sortf = sort_fitnessvalues(pop)
     for ind in sortf:
-        outfile.write("\n ind: %s %s %s " % (ind.fitness.values, ind.get_fsharing(), ind))
+        outfile.write('\n%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind))
+        #outfile.write("\n ind: %s %s %s " % (ind.fitness.values, ind.get_fsharing(), ind))
 
     outfile.close()
     return pop, log, hof
@@ -101,7 +102,7 @@ def run(number,problem):
         n += 1
 
 if __name__ == "__main__":
-    n = 1
+    n = 2
     while n < 30:
         main(n,6)
         n += 1

@@ -8,8 +8,8 @@ import Korns12
 import Vladislavleva1
 import Pagie1
 
-problems = 8
-p = 7
+problems = 6
+p = 6
 n = 30
 while p <= problems:
     if p == 1:
