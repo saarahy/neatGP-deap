@@ -2,7 +2,7 @@ import operator
 import math
 import random
 import csv
-import numpy
+import numpy as np
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -36,11 +36,9 @@ def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
     sqerrors = []
     for elem in range(len(points)):
-        y=[0.0]
         num_div = [1.0/x for x in points[:elem]]
-        for x in range(elem):
-            y[0] += num_div[x]
-        sqerrors.append((func(points[elem])-(y[0]))**2)
+        y=np.sum(num_div[x] for x in range(0,len(num_div)))
+        sqerrors.append((func(points[elem])-(y))**2)
     return math.fsum(sqerrors) / len(points),
 
 
@@ -70,14 +68,14 @@ def main(n_corr,p):
     stats_size = tools.Statistics(len)
     stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
     mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test= stats_fit_test)
-    mstats.register("avg", numpy.mean)
-    mstats.register("std", numpy.std)
-    mstats.register("min", numpy.min)
-    mstats.register("max", numpy.max)
+    mstats.register("avg", np.mean)
+    mstats.register("std", np.std)
+    mstats.register("min", np.min)
+    mstats.register("max", np.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
     neat = True
-    pelit = 0.6
+    pelit = 0.5
     pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt'%(p,n_corr), 'w')
@@ -102,7 +100,7 @@ def run(number,problem):
         n += 1
 
 if __name__ == "__main__":
-    n = 2
+    n = 1
     while n < 30:
         main(n,6)
         n += 1
