@@ -1,41 +1,87 @@
 import math
+import numpy as np
+
+z = np.array([0.])
 
 
-def safe_div(left, right):
+def protectedDiv(left, right):
     try:
         return left / right
     except ZeroDivisionError:
-        return 0.0
+        return z
+
+def myexp(x):
+    with np.errstate(divide='ignore',invalid='ignore'):
+        if isinstance(x, np.ndarray):
+            x[x>700]=700
+            x = np.exp(x)
+            print x[np.isinf(x)]
+            x[np.isinf(x)] = 0.0
+            x[np.isnan(x)] = 0.0
+        else:
+            if x<700:
+                x=700
+            x=np.exp(x)
+            if np.isinf(x):
+                x=0.0
+        return x
+
+
+def safe_div(left, right):
+    with np.errstate(divide='ignore',invalid='ignore'):
+        x = np.divide(left, right)
+        if isinstance(x, np.ndarray):
+            x[np.isinf(x)] = 0.0
+            x[np.isnan(x)] = 0.0
+        elif np.isinf(x) or np.isnan(x):
+            x = 0.0
+    return x
 
 
 def mylog(x):
-    if x == 0:
-        return 0.0
-    else:
-        return math.log10(abs(x))
+    with np.errstate(divide='ignore',invalid='ignore'):
+        if isinstance(x,np.ndarray):
+            x=np.log10(abs(x))
+            x[np.isinf(x)] = 0
+            return x
+        else:
+            if x == 0:
+                return z
+            else:
+                return np.log10(abs(x))
 
 
 def mysqrt(x):
-    if x <= 0.0:
-        return 0.0
+    if isinstance(x,np.ndarray):
+        x[x<=0.0]=0.0
+        return np.sqrt(x)
     else:
-        return math.sqrt(x)
+        if x <= 0.0:
+            return z
+        else:
+            return np.sqrt(x)
 
 
 def mypower2(x):
-    y = math.pow(x, 2)
-    if isinstance(y, complex) or math.isinf(y) or math.isnan(y):
-        return 0.0
+    if isinstance(x,np.ndarray):
+        y = np.power(x, 2)
     else:
-        return y
+        y = [np.power(x, 2)]
+    if np.logical_or(isinstance(y, complex), np.isinf(y), np.isnan(y)).all():
+        return z
+    else:
+        return np.array(y)
 
 
 def mypower3(x):
-    y = math.pow(x, 3)
-    if isinstance(y, complex) or math.isinf(y) or math.isnan(y):
-        return 0.0
+    if isinstance(x,np.ndarray):
+        y = np.power(x, 3)
     else:
-        return y
+        y = [np.power(x, 3)]
+    if np.logical_or(isinstance(y, complex), np.isinf(y), np.isnan(y)).all():
+        return z
+    else:
+        return np.array(y)
 
 
 def negative(x):
