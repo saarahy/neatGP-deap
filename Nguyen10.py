@@ -2,7 +2,9 @@ import operator
 import math
 import random
 import csv
+import cProfile
 import numpy
+from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -18,12 +20,10 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
+pset.addPrimitive(numpy.cos, 1)
+pset.addPrimitive(numpy.sin, 1)
 #pset.addPrimitive(math.exp,1)
 pset.addPrimitive(mylog,1)
-pset.addPrimitive(math.tan, 1)
-pset.addPrimitive(math.tanh, 1)
 pset.renameArguments(ARG0='x')
 pset.renameArguments(ARG1='y')
 
@@ -37,32 +37,45 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors = []
-    for elem in range(len(points[0])):
-        sqerrors.append((func(float(points[0][elem]), float(points[1][elem])) - (2.0 * math.sin(float(points[0][elem]))*math.cos(float(points[1][elem]))))**2)
-    return math.fsum(sqerrors) / len(points),
-
+    values = 2.0 * numpy.sin(points[:,0])*numpy.cos(points[:,1])
+    sqerrors = numpy.sum((func(*points) - values)**2)
+    return sqerrors / len(points),
 
 def Nguyen10(n_corr):
-    with open("./data_corridas/Nguyen10/corrida%d/test_x.txt" %n_corr) as spambase:
-        spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], []]
-        for row in spamReader:
-            Matrix[0].append(Decimal(row[0]))
-            Matrix[1].append(Decimal(row[1]))
-        spam = Matrix
-    with open("./data_corridas/Nguyen10/corrida%d/train_x.txt"%n_corr) as spamb:
-        spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], []]
-        for row in spamReader2:
-            Matrix[0].append(Decimal(row[0]))
-            Matrix[1].append(Decimal(row[1]))
-        spam2 = Matrix
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+    direccion="./data_corridas/Nguyen10/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Nguyen10/corrida%d/train_x.txt"
+    my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
+    my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
+    toolbox.register("evaluate", evalSymbReg, points=my_data2)
+    toolbox.register("evaluate_test", evalSymbReg, points=my_data)
+
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     sqerrors = []
+#     for elem in range(len(points[0])):
+#         sqerrors.append((func(float(points[0][elem]), float(points[1][elem])) - (2.0 * math.sin(float(points[0][elem]))*math.cos(float(points[1][elem]))))**2)
+#     return math.fsum(sqerrors) / len(points),
+
+
+# def Nguyen10(n_corr):
+#     with open("./data_corridas/Nguyen10/corrida%d/test_x.txt" %n_corr) as spambase:
+#         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
+#         Matrix = [[], []]
+#         for row in spamReader:
+#             Matrix[0].append(Decimal(row[0]))
+#             Matrix[1].append(Decimal(row[1]))
+#         spam = Matrix
+#     with open("./data_corridas/Nguyen10/corrida%d/train_x.txt"%n_corr) as spamb:
+#         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
+#         Matrix = [[], []]
+#         for row in spamReader2:
+#             Matrix[0].append(Decimal(row[0]))
+#             Matrix[1].append(Decimal(row[1]))
+#         spam2 = Matrix
+#     toolbox.register("evaluate", evalSymbReg, points=spam2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def main(n_corr, p):
@@ -114,5 +127,6 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 30:
-        main(n, 5)
+        #main(n, 5)
+        cProfile.run('print main(n, 5); print')
         n += 1

@@ -2,7 +2,9 @@ import operator
 import math
 import random
 import csv
+import cProfile
 import numpy
+from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -20,8 +22,8 @@ pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
 pset.addPrimitive(mylog, 1)
-pset.addPrimitive(math.sin, 1)
-pset.addPrimitive(math.cos, 1)
+pset.addPrimitive(numpy.cos, 1)
+pset.addPrimitive(numpy.sin, 1)
 pset.renameArguments(ARG0='x1')
 pset.renameArguments(ARG1='x2')
 
@@ -112,6 +114,7 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 30:
-        main(n, 8)
+        #main(n, 8)
+        cProfile.run('print main(n, 8); print')
         n += 1
 

@@ -2,7 +2,9 @@ import operator
 import math
 import random
 import csv
+import cProfile
 import numpy as np
+from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -31,26 +33,41 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors = []
-    for elem in range(len(points)):
-        num_div = [1.0/x for x in points[:elem]]
-        y=np.sum(num_div[x] for x in range(0,len(num_div)))
-        sqerrors.append((func(points[elem])-(y))**2)
-    return math.fsum(sqerrors) / len(points),
-
+    values=np.sum(1.0/points)
+    sqerrors = np.sum((func(points) - values)**2)
+    return sqerrors / len(points),
 
 def Keijzer6(n_corr):
-    with open("./data_corridas/Keijzer6/corrida%d/test_x.txt" % n_corr) as spambase:
-        spamReader = csv.reader(spambase)
-        spam = [float(row[0]) for row in spamReader]
-    with open("./data_corridas/Keijzer6/corrida%d/train_x.txt"% n_corr) as spamb:
-        spamReader2 = csv.reader(spamb)
-        spam2 = [float(row[0]) for row in spamReader2]
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+    direccion="./data_corridas/Keijzer6/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Keijzer6/corrida%d/train_x.txt"
+    my_data = np.genfromtxt(direccion % n_corr, delimiter=' ')
+    my_data2 = np.genfromtxt(direccion2 % n_corr, delimiter=' ')
+    toolbox.register("evaluate", evalSymbReg, points=my_data2)
+    toolbox.register("evaluate_test", evalSymbReg, points=my_data)
+
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     sqerrors = []
+#     for elem in range(len(points)):
+#         num_div = [1.0/x for x in points[:elem]]
+#         y=np.sum(num_div[x] for x in range(0,len(num_div)))
+#         sqerrors.append((func(points[elem])-(y))**2)
+#     return math.fsum(sqerrors) / len(points),
+#
+#
+# def Keijzer6(n_corr):
+#     direccion="./data_corridas/Keijzer6/corrida%d/test_x.txt"
+#     direccion2="./data_corridas/Keijzer6/corrida%d/train_x.txt"
+#     with open(direccion % n_corr) as spambase:
+#         spamReader = csv.reader(spambase)
+#         spam = [float(row[0]) for row in spamReader]
+#     with open(direccion2% n_corr) as spamb:
+#         spamReader2 = csv.reader(spamb)
+#         spam2 = [float(row[0]) for row in spamReader2]
+#     toolbox.register("evaluate", evalSymbReg, points=spam2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def main(n_corr,p):
@@ -102,5 +119,6 @@ def run(number,problem):
 if __name__ == "__main__":
     n = 1
     while n < 30:
-        main(n,6)
+        #main(n,6)
+        cProfile.run('print main(n, 6); print')
         n += 1

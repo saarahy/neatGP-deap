@@ -3,6 +3,8 @@ import math
 import random
 import csv
 import numpy
+import cProfile
+from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -19,12 +21,10 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
+pset.addPrimitive(numpy.cos, 1)
+pset.addPrimitive(numpy.sin, 1)
 #pset.addPrimitive(math.exp,1)
 pset.addPrimitive(mylog,1)
-pset.addPrimitive(math.tan, 1)
-pset.addPrimitive(math.tanh, 1)
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -37,22 +37,36 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors = ((func(x) - (math.log(x+1.0)+math.log(x**2+1.0)))**2 for x in points)
-    return math.fsum(sqerrors) / len(points),
-
+    values = numpy.log(points[:]+1.0)+ numpy.log(points[:]**2+1.0)
+    sqerrors = numpy.sum((func(points) - values)**2)
+    return sqerrors / len(points),
 
 def Nguyen7(n_corr):
-    with open("./data_corridas/Nguyen7/corrida%d/test_x.txt" % n_corr) as spambase:
-        spamReader = csv.reader(spambase)
-        spam = [float(row[0]) for row in spamReader]
-    with open("./data_corridas/Nguyen7/corrida%d/train_x.txt"%n_corr) as spamb:
-        spamReader2 = csv.reader(spamb)
-        spam2 = [float(row[0]) for row in spamReader2]
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+    direccion="./data_corridas/Nguyen5/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Nguyen5/corrida%d/train_x.txt"
+    my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
+    my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
+    toolbox.register("evaluate", evalSymbReg, points=my_data2)
+    toolbox.register("evaluate_test", evalSymbReg, points=my_data)
+
+
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     sqerrors = ((func(x) - (math.log(x+1.0)+math.log(x**2+1.0)))**2 for x in points)
+#     return math.fsum(sqerrors) / len(points),
+#
+#
+# def Nguyen7(n_corr):
+#     with open("./data_corridas/Nguyen7/corrida%d/test_x.txt" % n_corr) as spambase:
+#         spamReader = csv.reader(spambase)
+#         spam = [float(row[0]) for row in spamReader]
+#     with open("./data_corridas/Nguyen7/corrida%d/train_x.txt"%n_corr) as spamb:
+#         spamReader2 = csv.reader(spamb)
+#         spam2 = [float(row[0]) for row in spamReader2]
+#     toolbox.register("evaluate", evalSymbReg, points=spam2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def main(n_corr, p):
@@ -104,5 +118,6 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 30:
-        main(n, 4)
+        #main(n, 4)
+        cProfile.run('print main(n, 4); print')
         n += 1
