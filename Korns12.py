@@ -2,6 +2,8 @@ import operator
 import math
 import random
 import csv
+import cProfile
+
 import numpy as np
 from decimal import Decimal
 from deap import algorithms
@@ -11,28 +13,25 @@ from deap import tools
 from deap import gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
-from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt
+from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt, myexp
 
-pset = gp.PrimitiveSet("MAIN", 2)
+pset = gp.PrimitiveSet("MAIN", 5)
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
-#pset.addPrimitive(math.exp,1)
+pset.addPrimitive(np.cos, 1)
+pset.addPrimitive(np.sin, 1)
+#pset.addPrimitive(myexp, 1)
 pset.addPrimitive(mylog, 1)
 pset.addPrimitive(mypower2, 1)
 pset.addPrimitive(mypower3, 1)
 pset.addPrimitive(mysqrt, 1)
-pset.addPrimitive(math.tan, 1)
-pset.addPrimitive(math.tanh, 1)
+pset.addPrimitive(np.tan, 1)
+pset.addPrimitive(np.tanh, 1)
 pset.addEphemeralConstant("rand101", lambda: random.uniform(-1, 1))
-pset.renameArguments(ARG0='x0')
-pset.renameArguments(ARG1='x1')
-pset.renameArguments(ARG2='x2')
-pset.renameArguments(ARG3='x3')
-pset.renameArguments(ARG4='x4')
+pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4')
+
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
@@ -47,14 +46,10 @@ toolbox.register("compile", gp.compile, pset=pset)
 
 def evalSymbRegKorns(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors = []
-    for elem in range(len(points[0])):
-        try:
-            sqerrors.append((func(float(points[0][elem]), float(points[4][elem]))-(2.0-(2.1 * (math.cos(9.8 * float(points[0][elem]))*math.sin(1.3 * float(points[4][elem]))))))**2)
-        except Exception:
-            sqerrors.append((Decimal(func(float(points[0][elem]), float(points[0][elem])))-(Decimal(2.0)-(Decimal(2.1) * (Decimal(math.cos(Decimal(9.8) * Decimal(points[0][elem])))*Decimal(math.sin(Decimal(1.3) * Decimal(points[4][elem])))))))**2)
-    return math.fsum(sqerrors) / len(points[0]),
-
+    #print individual
+    values = 2.0-(2.1 * (np.cos(9.8 * points.T[:, 0]) * np.sin(1.3 * points.T[:, 4])))
+    diff = np.sum((func(*points)-values)**2)
+    return diff/len(points.T),
 
 def Korns(n_corr):
     direccion="./data_corridas/Korns/corrida%d/test_x.txt"
@@ -67,18 +62,16 @@ def Korns(n_corr):
         for row, c in zip(spamReader, range(num_c)):
             for r in range(num_r):
                 Matrix[r, c] = row[r]
-        spam = Matrix
     with open(direccion2 % n_corr) as spamb:
         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
         num_c = sum(1 for line in open(direccion2 % n_corr))
         num_r = len(next(csv.reader(open(direccion2 % n_corr), delimiter=' ', skipinitialspace=True)))
-        Matrix = np.empty((num_r, num_c,))
+        Matrix2 = np.empty((num_r, num_c,))
         for row, c in zip(spamReader2, range(num_c)):
             for r in range(num_r):
-                Matrix[r, c] = row[r]
-        spam2 = Matrix
-    toolbox.register("evaluate", evalSymbRegKorns, points=spam2)
-    toolbox.register("evaluate_test", evalSymbRegKorns, points=spam)
+                Matrix2[r, c] = row[r]
+    toolbox.register("evaluate", evalSymbRegKorns, points=Matrix2)
+    toolbox.register("evaluate_test", evalSymbRegKorns, points=Matrix)
 
 
 def main(n_corr, p):
@@ -89,7 +82,7 @@ def main(n_corr, p):
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=500)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -103,7 +96,7 @@ def main(n_corr, p):
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
     neat = True
-    pelit = 0.6
+    pelit = 0.5
     pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
@@ -129,6 +122,7 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 30:
+    while n < 31:
+        #cProfile.run('print main(n, 9); print')
         main(n, 9)
         n += 1
