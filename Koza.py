@@ -2,15 +2,15 @@ import operator
 import math
 import random
 import csv
-import numpy as np
+import numpy
 import cProfile
-from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+from numpy import genfromtxt
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
 from my_operators import safe_div, mylog
@@ -20,10 +20,10 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
-pset.addPrimitive(np.cos, 1)
-pset.addPrimitive(np.sin, 1)
+pset.addPrimitive(numpy.cos, 1)
+pset.addPrimitive(numpy.sin, 1)
 #pset.addPrimitive(math.exp,1)
-pset.addPrimitive(mylog, 1)
+pset.addPrimitive(mylog,1)
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -36,18 +36,17 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-#
 # def evalSymbReg(individual, points):
 #     func = toolbox.compile(expr=individual)
 #     values=points[:]**4 + points[:]**3 + points[:]**2 + points[:]
-#     sqerrors = np.sum((func(points) - values)**2)
+#     sqerrors = numpy.sum((func(points) - values)**2)
 #     return sqerrors / len(points),
-
+#
 # def Koza(n_corr):
 #     direccion="./data_corridas/Koza/corrida%d/test_x.txt"
 #     direccion2="./data_corridas/Koza/corrida%d/train_x.txt"
-#     my_data = np.genfromtxt(direccion % n_corr, delimiter=' ')
-#     my_data2 = np.genfromtxt(direccion2 % n_corr, delimiter=' ')
+#     my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
+#     my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
 #     toolbox.register("evaluate", evalSymbReg, points=my_data2)
 #     toolbox.register("evaluate_test", evalSymbReg, points=my_data)
 
@@ -67,6 +66,7 @@ def Koza(n_corr):
     toolbox.register("evaluate", evalSymbReg, points=spam2)
     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
+
 def main(n_corr, p):
     Koza(n_corr)
 
@@ -82,10 +82,10 @@ def main(n_corr, p):
     stats_size = tools.Statistics(len)
     stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
     mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
-    mstats.register("avg", np.mean)
-    mstats.register("std", np.std)
-    mstats.register("min", np.min)
-    mstats.register("max", np.max)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
+    mstats.register("min", numpy.min)
+    mstats.register("max", numpy.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
     neat = True
