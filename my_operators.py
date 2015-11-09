@@ -89,7 +89,14 @@ def negative(x):
 
 
 def undivide(x):
-    if x == 0:
-        return 1.0
+    if isinstance(x,np.ndarray):
+        with np.errstate(divide='ignore',invalid='ignore'):
+            x = np.divide(1.0, x)
+            x[np.isinf(x)] = 0.0
+            x[np.isnan(x)] = 0.0
+            return x
     else:
-        return 1.0/x
+        if x == 0:
+            return 1.0
+        else:
+            return 1.0/x

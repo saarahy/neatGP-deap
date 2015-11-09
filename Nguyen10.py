@@ -39,17 +39,31 @@ toolbox.register("compile", gp.compile, pset=pset)
 
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    values = 2.0 * numpy.sin(points[:,0])*numpy.cos(points[:,1])
+    values = 2.0 * numpy.sin(points.T[:,0])*numpy.cos(points.T[:,1])
     sqerrors = numpy.sum((func(*points) - values)**2)
     return sqerrors / len(points),
 
 def Nguyen10(n_corr):
     direccion="./data_corridas/Nguyen10/corrida%d/test_x.txt"
     direccion2="./data_corridas/Nguyen10/corrida%d/train_x.txt"
-    my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
-    my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
-    toolbox.register("evaluate", evalSymbReg, points=my_data2)
-    toolbox.register("evaluate_test", evalSymbReg, points=my_data)
+    with open(direccion% n_corr) as spambase:
+        spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
+        num_c = sum(1 for line in open(direccion % n_corr))
+        num_r = len(next(csv.reader(open(direccion % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix = numpy.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                Matrix[r, c] = row[r]
+    with open(direccion2 % n_corr) as spamb:
+        spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
+        num_c = sum(1 for line in open(direccion2 % n_corr))
+        num_r = len(next(csv.reader(open(direccion2 % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix2 = numpy.empty((num_r, num_c,))
+        for row, c in zip(spamReader2, range(num_c)):
+            for r in range(num_r):
+                Matrix2[r, c] = row[r]
+    toolbox.register("evaluate", evalSymbReg, points=Matrix2)
+    toolbox.register("evaluate_test", evalSymbReg, points=Matrix)
 
 # def evalSymbReg(individual, points):
 #     func = toolbox.compile(expr=individual)
@@ -127,6 +141,6 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 30:
-        #main(n, 5)
-        cProfile.run('print main(n, 5); print')
+        main(n, 5)
+        #cProfile.run('print main(n, 5); print')
         n += 1
