@@ -36,32 +36,59 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors=[]
-    for elem in range(len(points[0])):
-        sqerrors.append((func(points[0][elem],points[1][elem])-((math.exp(-((points[0][elem]-1)**2)))/(1.2+((points[1][elem]-2.5)**2))))**2)
-    return math.fsum(sqerrors) / len(points),
-
+    values = (numpy.exp(-((points.T[:,0]-1)**2)))/(1.2+((points.T[:,1]-2.5)**2))
+    sqerrors = numpy.sum((func(*points) - values)**2)
+    return sqerrors / len(points),
 
 def Vladislavleva(n_corr):
-    with open("./data_corridas/Vladislavleva1/corrida%d/test_x.txt" %n_corr) as spambase:
+    direccion="./data_corridas/Vladislavleva1/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Vladislavleva1/corrida%d/train_x.txt"
+    with open(direccion% n_corr) as spambase:
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], []]
-        for row in spamReader:
-            Matrix[0].append(float(row[0]))
-            Matrix[1].append(float(row[1]))
-        spam = Matrix
-    with open("./data_corridas/Vladislavleva1/corrida%d/train_x.txt"%n_corr) as spamb:
+        num_c = sum(1 for line in open(direccion % n_corr))
+        num_r = len(next(csv.reader(open(direccion % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix = numpy.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                Matrix[r, c] = row[r]
+    with open(direccion2 % n_corr) as spamb:
         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
-        Matrix = [[], []]
-        for row in spamReader2:
-            Matrix[0].append(float(row[0]))
-            Matrix[1].append(float(row[1]))
-        spam2 = Matrix
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+        num_c = sum(1 for line in open(direccion2 % n_corr))
+        num_r = len(next(csv.reader(open(direccion2 % n_corr), delimiter=' ', skipinitialspace=True)))
+        Matrix2 = numpy.empty((num_r, num_c,))
+        for row, c in zip(spamReader2, range(num_c)):
+            for r in range(num_r):
+                Matrix2[r, c] = row[r]
+    toolbox.register("evaluate", evalSymbReg, points=Matrix2)
+    toolbox.register("evaluate_test", evalSymbReg, points=Matrix)
+
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     sqerrors=[]
+#     for elem in range(len(points[0])):
+       # sqerrors.append((func(points[0][elem],points[1][elem])-((math.exp(-((points[0][elem]-1)**2)))/(1.2+((points[1][elem]-2.5)**2))))**2)
+#     return math.fsum(sqerrors) / len(points),
+#
+#
+# def Vladislavleva(n_corr):
+#     with open("./data_corridas/Vladislavleva1/corrida%d/test_x.txt" %n_corr) as spambase:
+#         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
+#         Matrix = [[], []]
+#         for row in spamReader:
+#             Matrix[0].append(float(row[0]))
+#             Matrix[1].append(float(row[1]))
+#         spam = Matrix
+#     with open("./data_corridas/Vladislavleva1/corrida%d/train_x.txt"%n_corr) as spamb:
+#         spamReader2 = csv.reader(spamb,  delimiter=' ', skipinitialspace=True)
+#         Matrix = [[], []]
+#         for row in spamReader2:
+#             Matrix[0].append(float(row[0]))
+#             Matrix[1].append(float(row[1]))
+#         spam2 = Matrix
+#     toolbox.register("evaluate", evalSymbReg, points=spam2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def main(n_corr, p):
