@@ -18,24 +18,34 @@ import operator
 import csv
 import itertools
 
-import numpy
+import numpy as np
 
 from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+import my_operators as mo
 
-# Read the spam list features and put it in a list of lists.
-# The dataset is from http://archive.ics.uci.edu/ml/datasets/Spambase
-# This example is a copy of the OpenBEAGLE example :
-# http://beagle.gel.ulaval.ca/refmanual/beagle/html/d2/dbe/group__Spambase.html
-with open("spambase.csv") as spambase:
-    spamReader = csv.reader(spambase)
-    spam = list(list(float(elem) for elem in row) for row in spamReader)
+direccion="./data_corridas/BreastCancer/breast-cancer-wisconsin.txt"
+with open(direccion) as spambase:
+    # spamReader = csv.reader(spambase)
+    # spam = list(list(elem for elem in row) for row in spamReader)
+    spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
+    num_c = sum(1 for line in open(direccion))
+    num_r = len(next(csv.reader(open(direccion), delimiter=',', skipinitialspace=True)))
+    Matrix = np.empty((num_r, num_c,))
+    for row, c in zip(spamReader, range(num_c)):
+        for r in range(num_r):
+            try:
+                #print row[r]
+                Matrix[r, c] = row[r]
+            except ValueError:
+                print 'Line {r} is corrupt' , r
+                break
 
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSet("MAIN", 57)
+pset = gp.PrimitiveSet("MAIN", 10)
 
 # boolean operators
 # pset.addPrimitive(operator.and_, [bool, bool], bool)
@@ -47,26 +57,29 @@ pset = gp.PrimitiveSet("MAIN", 57)
 def protectedDiv(left, right):
     try: return left / right
     except ZeroDivisionError: return 1
-
-pset.addPrimitive(operator.add, 2)
-pset.addPrimitive(operator.sub, 2)
-pset.addPrimitive(operator.mul, 2)
-pset.addPrimitive(protectedDiv, 2)
-
-# logic operators
 # Define a new if-then-else function
 def if_then_else(input, output1, output2):
     if input: return output1
     else: return output2
 
-# pset.addPrimitive(operator.lt, [float, float], bool)
+pset.addPrimitive(operator.add, 2)
+pset.addPrimitive(operator.sub, 2)
+pset.addPrimitive(operator.mul, 2)
+pset.addPrimitive(protectedDiv, 2)
+pset.addPrimitive(np.sin, 1)
+pset.addPrimitive(np.cos, 1)
+pset.addPrimitive(mo.mysqrt, 1)
+pset.addPrimitive(np.abs, 1)
+pset.addPrimitive(if_then_else, 3)
+pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4', ARG5='x5' , ARG6='x6' , ARG7='x7' , ARG8='x8' , ARG9='x9')
+#pset.addPrimitive(operator.lt, [float, float], bool)
 # pset.addPrimitive(operator.eq, [float, float], bool)
 # pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
-pset.addEphemeralConstant("rand100", lambda: random.random() * 100)
-pset.addTerminal(False)
-pset.addTerminal(True)
+# pset.addEphemeralConstant("rand100", lambda: random.random() * 100)
+# pset.addTerminal(False)
+# pset.addTerminal(True)
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(1.0,))
@@ -82,9 +95,9 @@ def evalSpambase(individual):
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
     # Randomly sample 400 mails in the spam database
-    spam_samp = random.sample(spam, 400)
+    spam_samp = random.sample(Matrix.T, 400)
     # Evaluate the sum of correctly identified mail as spam
-    result = sum(bool(func(*mail[:57])) is bool(mail[57]) for mail in spam_samp)
+    result = sum(bool(func(*mail[:10])) is bool(mail[10]) for mail in spam_samp)
     return result,
     
 toolbox.register("evaluate", evalSpambase)
@@ -95,14 +108,17 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 def main():
-    random.seed(10)
-    pop = toolbox.population(n=100)
+    #random.seed(10)
+    pop = toolbox.population(n=200)
     hof = tools.HallOfFame(1)
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
-    stats.register("avg", numpy.mean)
-    stats.register("std", numpy.std)
-    stats.register("min", numpy.min)
-    stats.register("max", numpy.max)
+    stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+    stats_size = tools.Statistics(len)
+    stats_fit_test = tools.Statistics(lambda i: i.fitness_test.values)
+    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
+    mstats.register("avg", np.mean)
+    mstats.register("std", np.std)
+    mstats.register("min", np.min)
+    mstats.register("max", np.max)
 
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
@@ -110,9 +126,9 @@ def main():
     pelit = 0.5
     n_corr=1
     p=1
-    algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=stats, halloffame=hof, verbose=True)
+    algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
-    return pop, stats, hof
+    return pop, mstats, hof
 
 if __name__ == "__main__":
     main()

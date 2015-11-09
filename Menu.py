@@ -8,7 +8,7 @@ import Korns12
 import Vladislavleva1
 import Pagie1
 
-problems = 6
+problems = 61
 p = 6
 n = 30
 while p <= problems:

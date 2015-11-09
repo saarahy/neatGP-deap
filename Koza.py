@@ -2,7 +2,9 @@ import operator
 import math
 import random
 import csv
-import numpy
+import numpy as np
+import cProfile
+from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
 from deap import base
@@ -18,12 +20,10 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
+pset.addPrimitive(np.cos, 1)
+pset.addPrimitive(np.sin, 1)
 #pset.addPrimitive(math.exp,1)
-pset.addPrimitive(mylog,1)
-pset.addPrimitive(math.tan, 1)
-pset.addPrimitive(math.tanh, 1)
+pset.addPrimitive(mylog, 1)
 pset.renameArguments(ARG0='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -36,6 +36,20 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
+#
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     values=points[:]**4 + points[:]**3 + points[:]**2 + points[:]
+#     sqerrors = np.sum((func(points) - values)**2)
+#     return sqerrors / len(points),
+
+# def Koza(n_corr):
+#     direccion="./data_corridas/Koza/corrida%d/test_x.txt"
+#     direccion2="./data_corridas/Koza/corrida%d/train_x.txt"
+#     my_data = np.genfromtxt(direccion % n_corr, delimiter=' ')
+#     my_data2 = np.genfromtxt(direccion2 % n_corr, delimiter=' ')
+#     toolbox.register("evaluate", evalSymbReg, points=my_data2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=my_data)
 
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
@@ -53,7 +67,6 @@ def Koza(n_corr):
     toolbox.register("evaluate", evalSymbReg, points=spam2)
     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
-
 def main(n_corr, p):
     Koza(n_corr)
 
@@ -62,22 +75,22 @@ def main(n_corr, p):
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=300)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
     stats_fit_test=tools.Statistics(lambda i: i.fitness_test.values)
     mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
-    mstats.register("avg", numpy.mean)
-    mstats.register("std", numpy.std)
-    mstats.register("min", numpy.min)
-    mstats.register("max", numpy.max)
+    mstats.register("avg", np.mean)
+    mstats.register("std", np.std)
+    mstats.register("min", np.min)
+    mstats.register("max", np.max)
     params = ['best_of_each_specie', 2, 'yes']
     neatcx = True
     neat = True
     pelit = 0.5
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 40, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
@@ -101,6 +114,7 @@ def run(number,problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 30:
-        main(n, 1)
+    while n < 2:
+        #main(n, 1)
+        cProfile.run('print main(n, 1); print')
         n += 1
