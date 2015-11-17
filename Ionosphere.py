@@ -12,7 +12,7 @@ from deap import tools
 from deap import gp
 import my_operators as mo
 
-direccion="./data_corridas/BreastCancer/breast-cancer-wisconsin.txt"
+direccion="./data_corridas/Ionosphere/ionosphere.txt"
 with open(direccion) as spambase:
     # spamReader = csv.reader(spambase)
     # spam = list(list(elem for elem in row) for row in spamReader)
@@ -29,7 +29,7 @@ with open(direccion) as spambase:
                 break
 
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSet("MAIN", 10)
+pset = gp.PrimitiveSet("MAIN", 34)
 
 # Define a new if-then-else function
 def if_then_else(input, output1, output2):
@@ -65,8 +65,8 @@ def evalSpambase(individual, test):
     else:
         long=int(len(Matrix.T)*.3)
     spam_samp = random.sample(Matrix.T, long)
-    vector = [data[10] for data in spam_samp]
-    result = np.sum((func(*np.asarray(spam_samp).T[:10]) - vector)**2)
+    vector = [data[34] for data in spam_samp]
+    result = np.sum((func(*np.asarray(spam_samp).T[:34]) - vector)**2)
     return result/long,
     
 toolbox.register("evaluate", evalSpambase, test=False)
@@ -98,7 +98,7 @@ def main(n_corr, p):
 
 if __name__ == "__main__":
     n = 1
-    p = 9
+    p = 10
     while n < 31:
         main(n, p)
         n += 1
