@@ -73,7 +73,11 @@ def avg(population):
     suma=0
     for ind in population:
         #int1=list(ind.fitness.values)
-        suma+=ind.get_fsharing()#int1[0]
+        if np.isnan(ind.get_fsharing()):
+            fshre=999999999.99
+        else:
+            fshre=ind.get_fsharing()
+        suma+=fshre#int1[0]
     promedio=suma/len(population)
     return promedio
 
