@@ -12,10 +12,8 @@ from deap import tools
 from deap import gp
 import my_operators as mo
 
-direccion="./data_corridas/BreastCancer/breast-cancer-wisconsin.txt"
+direccion="./data_corridas/Sonar/sonar.txt"
 with open(direccion) as spambase:
-    # spamReader = csv.reader(spambase)
-    # spam = list(list(elem for elem in row) for row in spamReader)
     spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
     num_c = sum(1 for line in open(direccion))
     num_r = len(next(csv.reader(open(direccion), delimiter=',', skipinitialspace=True)))
@@ -29,7 +27,7 @@ with open(direccion) as spambase:
                 break
 
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSet("MAIN", 10)
+pset = gp.PrimitiveSet("MAIN", 60)
 
 # Define a new if-then-else function
 def if_then_else(input, output1, output2):
@@ -46,7 +44,7 @@ pset.addPrimitive(mo.mysqrt, 1)
 pset.addPrimitive(np.abs, 1)
 
 #pset.addPrimitive(if_then_else, 3)
-pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4', ARG5='x5' , ARG6='x6' , ARG7='x7' , ARG8='x8' , ARG9='x9')
+#pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4', ARG5='x5' , ARG6='x6' , ARG7='x7' , ARG8='x8' , ARG9='x9')
 
 creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
@@ -65,8 +63,8 @@ def evalSpambase(individual, test):
     else:
         long=int(len(Matrix.T)*.3)
     spam_samp = random.sample(Matrix.T, long)
-    vector = [data[10] for data in spam_samp]
-    result = np.sum((func(*np.asarray(spam_samp).T[:10]) - vector)**2)
+    vector = [data[60] for data in spam_samp]
+    result = np.sum((func(*np.asarray(spam_samp).T[:60]) - vector)**2)
     return result/long,
     
 toolbox.register("evaluate", evalSpambase, test=False)
@@ -98,7 +96,7 @@ def main(n_corr, p):
 
 if __name__ == "__main__":
     n = 1
-    p = 9
+    p = 13
     while n < 31:
         main(n, p)
         n += 1
