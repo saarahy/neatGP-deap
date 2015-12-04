@@ -1,6 +1,7 @@
 #add this imports
 from neat_gp import *
 from crosspoints import *
+import numpy as np
 
 #on the beginning of the class just add
 #the parameter 'neat'
@@ -14,3 +15,10 @@ def __init__(self, content):
         self.descendent=None
         self.fitness_h=None
         self.nspecie=None
+
+#add this property
+# @property
+#         def params(self):
+#         l=len(self)+4
+#         p=np.ones(l)
+#         return p
