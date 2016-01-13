@@ -15,6 +15,8 @@ from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
 from my_operators import safe_div, mylog
 
+
+
 pset = gp.PrimitiveSet("MAIN", 1)
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
@@ -68,6 +70,8 @@ def Koza(n_corr):
 
 
 def main(n_corr, p):
+    global cont_evalp
+    cont_evalp=0
     Koza(n_corr)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -87,18 +91,20 @@ def main(n_corr, p):
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    cxpb=0.7
-    mutpb=0.3
-    ngen=10
+    cxpb = 0.7
+    mutpb = 0.3
+    ngen = 10
     params = ['best_of_each_specie', 2, 'yes']
     neat_cx = False
     neat_alg = True
     neat_pelit = 0.5
-    neat_h= 0.15
-    LS_flag=True
-    LS_select=1
+    neat_h = 0.15
+    LS_flag = True
+    LS_select = 1
+    cont_evalf = 2500000 #contador maximo de de evaluaciones
 
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, LS_flag, LS_select, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 

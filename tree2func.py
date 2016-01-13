@@ -19,8 +19,6 @@ class tree2f:
             op = self.stack.pop()
             self.stack.append ('%s!' % (op) )
         elif p in ['sin', 'cos', 'tan', 'mylog']:
-            # if p=='mylog':
-            #     p='log'
             op = self.stack.pop ()
             self.stack.append('%s(%s)' % (p, op))
         else:
@@ -54,11 +52,11 @@ class tree2f:
             self.push(e)
         return self.stack.pop()
     def convert_r(self, l):
-        l.reverse()
+        #l.reverse()
         for e in l:
             self.push_r(e)
         cadena=''.join(self.stack)
-        del cadena[-1]
+        cadena = cadena[:-1]
         cadena2=''.join(self.brackets)
         cad=cadena+cadena2
         return cad
