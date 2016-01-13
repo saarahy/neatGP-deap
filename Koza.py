@@ -4,6 +4,7 @@ import random
 import csv
 import numpy
 import cProfile
+import scipy
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -35,35 +36,35 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-# def evalSymbReg(individual, points):
-#     func = toolbox.compile(expr=individual)
-#     values=points[:]**4 + points[:]**3 + points[:]**2 + points[:]
-#     sqerrors = numpy.sum((func(points) - values)**2)
-#     return sqerrors / len(points),
-#
-# def Koza(n_corr):
-#     direccion="./data_corridas/Koza/corrida%d/test_x.txt"
-#     direccion2="./data_corridas/Koza/corrida%d/train_x.txt"
-#     my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
-#     my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
-#     toolbox.register("evaluate", evalSymbReg, points=my_data2)
-#     toolbox.register("evaluate_test", evalSymbReg, points=my_data)
-
 def evalSymbReg(individual, points):
     func = toolbox.compile(expr=individual)
-    sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
-    return math.fsum(sqerrors) / len(points),
-
+    values=points[:]**4 + points[:]**3 + points[:]**2 + points[:]
+    sqerrors = numpy.sum((func(points) - values)**2)
+    return numpy.sqrt(sqerrors / len(points)),
 
 def Koza(n_corr):
-    with open("./data_corridas/Koza/corrida%d/test_x.txt" % n_corr) as spambase:
-        spamReader = csv.reader(spambase)
-        spam = [float(row[0]) for row in spamReader]
-    with open("./data_corridas/Koza/corrida%d/train_x.txt" % n_corr) as spamb:
-        spamReader2 = csv.reader(spamb)
-        spam2 = [float(row[0]) for row in spamReader2]
-    toolbox.register("evaluate", evalSymbReg, points=spam2)
-    toolbox.register("evaluate_test", evalSymbReg, points=spam)
+    direccion="./data_corridas/Koza/corrida%d/test_x.txt"
+    direccion2="./data_corridas/Koza/corrida%d/train_x.txt"
+    my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
+    my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
+    toolbox.register("evaluate", evalSymbReg, points=my_data2)
+    toolbox.register("evaluate_test", evalSymbReg, points=my_data)
+
+# def evalSymbReg(individual, points):
+#     func = toolbox.compile(expr=individual)
+#     sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
+#     return math.fsum(sqerrors) / len(points),
+#
+#
+# def Koza(n_corr):
+#     with open("./data_corridas/Koza/corrida%d/test_x.txt" % n_corr) as spambase:
+#         spamReader = csv.reader(spambase)
+#         spam = [float(row[0]) for row in spamReader]
+#     with open("./data_corridas/Koza/corrida%d/train_x.txt" % n_corr) as spamb:
+#         spamReader2 = csv.reader(spamb)
+#         spam2 = [float(row[0]) for row in spamReader2]
+#     toolbox.register("evaluate", evalSymbReg, points=spam2)
+#     toolbox.register("evaluate_test", evalSymbReg, points=spam)
 
 
 def main(n_corr, p):
@@ -74,7 +75,7 @@ def main(n_corr, p):
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-    pop = toolbox.population(n=300)
+    pop = toolbox.population(n=5)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -85,22 +86,29 @@ def main(n_corr, p):
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
+
+    cxpb=0.7
+    mutpb=0.3
+    ngen=10
     params = ['best_of_each_specie', 2, 'yes']
-    neatcx = True
-    neat = True
-    pelit = 0.5
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 40, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    neat_cx = False
+    neat_alg = True
+    neat_pelit = 0.5
+    neat_h= 0.15
+    LS_flag=True
+    LS_select=1
+
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, LS_flag, LS_select, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
-    outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
-    outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
-    outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s " %( hof[0].fitness, hof[0].fitness_test, str(hof[0])))
+    outfile.write("\n Best individual is: %s %s %s" % ( hof[1].fitness, hof[1].fitness_test, str(hof[1])))
+    outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness, hof[2].fitness_test, str(hof[2])))
 
     sortf = sort_fitnessvalues(pop)
     for ind in sortf:
-        outfile.write("\n ind: %s %s %s " % (ind.fitness.values, ind.get_fsharing(), ind))
-
+        outfile.write('\n%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
     outfile.close()
     return pop, log, hof
 
@@ -108,12 +116,12 @@ def main(n_corr, p):
 def run(number,problem):
     n = 1
     while n <= number:
-        main(n,problem)
+        main(n, problem)
         n += 1
 
 if __name__ == "__main__":
     n = 1
     while n < 2:
-        #main(n, 1)
-        cProfile.run('print main(n, 1); print')
+        main(n, 1)
+        #cProfile.run('print main(n, 1); print')
         n += 1

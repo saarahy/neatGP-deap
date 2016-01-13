@@ -28,6 +28,12 @@ class neat:
     def get_numspecie(self):
         return self.nspecie
 
+    def LS_probability(self, ps):
+        self.LS_prob=ps
+
+    def get_LS_prob(self):
+        return self.LS_prob
+
 class pop_param:
     def save_ind(self):
         return True
