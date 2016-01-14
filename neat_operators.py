@@ -20,6 +20,8 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx, pelit):
             of=copy.deepcopy(ind1)
             offspring=toolbox.mutate(of)
             offspring[0].descendents(0)
+            offspring[0].bestspecie_set(0)
+            offspring[0].LS_applied_set(0)
             offspring[0].fitness_sharing(0)
             offspring[0].specie(None)
             del offspring[0].fitness.values
@@ -54,6 +56,8 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx, pelit):
             hijo = neatcx(of1, of2, toolbox)
             hijo.descendents(0)
             hijo.fitness_sharing(0)
+            hijo.bestspecie_set(None)
+            hijo.LS_applied_set(0)
             hijo.specie(None)
             del hijo.fitness.values
 
