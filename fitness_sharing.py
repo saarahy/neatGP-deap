@@ -93,3 +93,4 @@ def SpeciesPunishment(population,params,h):
             if id_mejor!=0 or id_mejor!=None:
                 population[id_mejor].fitness_sharing(fitness_mejor)
                 population[id_mejor].fitness.values=fitness_mejor,
+                population[id_mejor].bestspecie_set(1)
