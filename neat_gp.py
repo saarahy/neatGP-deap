@@ -40,6 +40,18 @@ class neat:
     def get_params(self):
         return self.params
 
+    def bestspecie_set(self, value):
+        self.best_ind=value
+
+    def bestspecie_get(self):
+        return self.best_ind
+
+    def LS_applied_set(self, value):
+        self.ls_ind=value
+
+    def LS_applied_get(self):
+        return self.ls_ind
+
 class pop_param:
     def save_ind(self):
         return True

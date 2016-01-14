@@ -5,6 +5,7 @@ import csv
 import numpy
 import cProfile
 import scipy
+import funcEval
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -70,8 +71,7 @@ def Koza(n_corr):
 
 
 def main(n_corr, p):
-    global cont_evalp
-    cont_evalp=0
+    funcEval.LS_flag = True
     Koza(n_corr)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -79,7 +79,7 @@ def main(n_corr, p):
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-    pop = toolbox.population(n=5)
+    pop = toolbox.population(n=15)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -95,16 +95,16 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 10
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = False
+    neat_cx = True
     neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
-    LS_flag = True
-    LS_select = 1
+    funcEval.LS_flag = True
+    LS_select = 2
     cont_evalf = 2500000 #contador maximo de de evaluaciones
 
 
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
