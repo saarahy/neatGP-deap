@@ -19,6 +19,7 @@ from my_operators import safe_div, mylog
 
 
 pset = gp.PrimitiveSet("MAIN", 1)
+
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
@@ -28,6 +29,7 @@ pset.addPrimitive(numpy.sin, 1)
 #pset.addPrimitive(math.exp,1)
 pset.addPrimitive(mylog,1)
 pset.renameArguments(ARG0='x')
+#pset.addEphemeralConstant('eph',lambda: random.uniform(-1, 1))
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
@@ -95,12 +97,12 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 10
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
+    neat_cx = False
     neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
     funcEval.LS_flag = True
-    LS_select = 2
+    LS_select = 1
     cont_evalf = 2500000 #contador maximo de de evaluaciones
 
 
