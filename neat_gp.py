@@ -52,6 +52,12 @@ class neat:
     def LS_applied_get(self):
         return self.ls_ind
 
+    def LS_fitness_set(self,value):
+        self.ls_fitness=value
+
+    def LS_fitness_get(self):
+        return self.ls_fitness
+
 class pop_param:
     def save_ind(self):
         return True
