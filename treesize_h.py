@@ -35,7 +35,8 @@ def trees_h(population, n):
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
             xdata,ydata=get_address(n)
-
+            outp=open('ls_ind.txt', 'a')
+            outp.write('\n%s;%s;%s' %(ind.get_params(),ind, cd))
             beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
