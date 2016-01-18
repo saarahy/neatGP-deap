@@ -10,7 +10,6 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx, pelit):
     while i<n:
         if n>len(copy_parent): #if the parent pool is less than the number of child
             copy_parent[:]=copy.deepcopy(parents)
-
         eflag=random.random()#int(round(random.random()))
         if eflag<pelit:
             ind1=copy_parent[0] #best ind in the population by fitness
@@ -33,7 +32,7 @@ def neatGP(toolbox,parents,cxpb,mutpb,n, mut,cx, pelit):
                 break
 
             ind1.descendents(ind1.get_descendents()-1)
-        elif cx==1: #neat-mate
+        elif cx==1:
             ind_nspecie=get_specie_ind(ind1,copy_parent)
             if ind_nspecie > 1 and eflag<pelit:
                 ind2=[]

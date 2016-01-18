@@ -64,7 +64,7 @@ def num_desc(ind, avg):
     if int1==0.0:
         int1=1
     numd=round(avg/int1)
-    if  np.isnan(numd):
+    if np.isnan(numd):
         print avg
         print int1
     return int(numd)

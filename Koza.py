@@ -19,6 +19,7 @@ from my_operators import safe_div, mylog
 
 
 pset = gp.PrimitiveSet("MAIN", 1)
+
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
@@ -28,6 +29,7 @@ pset.addPrimitive(numpy.sin, 1)
 #pset.addPrimitive(math.exp,1)
 pset.addPrimitive(mylog,1)
 pset.renameArguments(ARG0='x')
+#pset.addEphemeralConstant('eph',lambda: random.uniform(-1, 1))
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
@@ -50,6 +52,7 @@ def Koza(n_corr):
     direccion2="./data_corridas/Koza/corrida%d/train_x.txt"
     my_data = numpy.genfromtxt(direccion % n_corr, delimiter=' ')
     my_data2 = numpy.genfromtxt(direccion2 % n_corr, delimiter=' ')
+
     toolbox.register("evaluate", evalSymbReg, points=my_data2)
     toolbox.register("evaluate_test", evalSymbReg, points=my_data)
 
@@ -78,8 +81,10 @@ def main(n_corr, p):
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+    toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    pop = toolbox.population(n=15)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -93,14 +98,14 @@ def main(n_corr, p):
 
     cxpb = 0.7
     mutpb = 0.3
-    ngen = 10
+    ngen = 500
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
+    neat_cx = False
     neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
     funcEval.LS_flag = True
-    LS_select = 2
+    LS_select = 1
     cont_evalf = 2500000 #contador maximo de de evaluaciones
 
 

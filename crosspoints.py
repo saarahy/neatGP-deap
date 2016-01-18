@@ -1,16 +1,23 @@
 import random
 import copy
+import funcEval
+import numpy as np
 from measure_tree import *
+
 
 def neatcx(ind1, ind2, toolbox):
     hijo=copy.deepcopy(ind1)
     flag=0
     n=0
-    while n<10:
+    while n<3:
         e1,e2=ext_node(hijo,ind2)
         l1,l2=int_node(hijo,ind2)
         for i in range(len(l1)): #cambio de nodo interno
             if random.random()<0.5:
+                params_2=ind2.get_params()
+                params_1=hijo.get_params()
+                params_1[i]=params_2[i]
+                hijo.params_set(params_1)
                 hijo[l1[i][0]]=l2[i][1]
                 flag=1
         for i in e1: #camio de nodos externos
@@ -24,6 +31,22 @@ def neatcx(ind1, ind2, toolbox):
                     slice2=ind2.searchSubtree(0)
                 else:
                     slice2=ind2.searchSubtree(e)
+                if funcEval.LS_flag:
+                    a=slice1.start
+                    b=slice1.stop
+                    c=slice2.start
+                    d=slice2.stop
+                    params1=hijo.get_params()
+                    params2=ind2.get_params()
+                    params1=params1.tolist()
+                    params2=params2.tolist()
+                    temp_p=params1[a+2:b+2]
+                    params1[a+2:b+2]=params2[c+2:d+2]
+                    params2[c+2:d+2]=temp_p
+                    params1=np.asarray(params1)
+                    params2=np.asarray(params2)
+                    hijo.params_set(params1)
+                    ind2.params_set(params2)
                 hijo[slice1], ind2[slice2]=ind2[slice2], hijo[slice1]
                 break
         if hijo==ind1 or hijo==ind2:
