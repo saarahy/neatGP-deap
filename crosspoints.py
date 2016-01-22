@@ -14,10 +14,11 @@ def neatcx(ind1, ind2, toolbox):
         l1,l2=int_node(hijo,ind2)
         for i in range(len(l1)): #cambio de nodo interno
             if random.random()<0.5:
-                params_2=ind2.get_params()
-                params_1=hijo.get_params()
-                params_1[i]=params_2[i]
-                hijo.params_set(params_1)
+                if funcEval.LS_flag:
+                    params_2=ind2.get_params()
+                    params_1=hijo.get_params()
+                    params_1[i]=params_2[i]
+                    hijo.params_set(params_1)
                 hijo[l1[i][0]]=l2[i][1]
                 flag=1
         for i in e1: #camio de nodos externos
