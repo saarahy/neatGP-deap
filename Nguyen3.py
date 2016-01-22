@@ -4,6 +4,7 @@ import random
 import csv
 import cProfile
 import numpy
+import funcEval
 from numpy import genfromtxt
 from decimal import Decimal
 from deap import algorithms
@@ -75,8 +76,10 @@ def main(n_corr, p):
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+    toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -87,28 +90,36 @@ def main(n_corr, p):
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
+    cxpb = 0.7
+    mutpb = 0.3
+    ngen = 30000
     params = ['best_of_each_specie', 2, 'yes']
-    neatcx = True
-    neat = True
-    pelit = 0.5
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.7, 0.3, 100, neat, neatcx, 0.15, pelit, n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    neat_cx = False
+    neat_alg = True
+    neat_pelit = 0.5
+    neat_h = 0.15
+    funcEval.LS_flag = True
+    LS_select = 1
+    funcEval.cont_evalp=0
+    cont_evalf = 2500000 #contador maximo de de evaluaciones
+
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
-    outfile.write("\n Best individual is: %s %s %s " % (str(hof[0]), hof[0].fitness, hof[0].fitness_test))
-    outfile.write("\n Best individual is: %s %s %s" % (str(hof[1]), hof[1].fitness, hof[1].fitness_test))
-    outfile.write("\n Best individual is: %s %s %s" % (str(hof[2]), hof[2].fitness, hof[2].fitness_test))
+    outfile.write("\n Best individual is: %s %s %s " %( hof[0].fitness, hof[0].fitness_test, str(hof[0])))
+    outfile.write("\n Best individual is: %s %s %s" % ( hof[1].fitness, hof[1].fitness_test, str(hof[1])))
+    outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness, hof[2].fitness_test, str(hof[2])))
 
     sortf = sort_fitnessvalues(pop)
     for ind in sortf:
-        outfile.write("\n ind: %s %s %s " % (ind.fitness.values, ind.get_fsharing(), ind))
-
+        outfile.write('\n%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
     outfile.close()
     return pop, log, hof
 
 
 def run(number, problem):
-    n = 1
+    n = 8
     while n <= number:
         main(n, problem)
         n += 1
@@ -116,7 +127,8 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 2:
-        #main(n, 2)
-        cProfile.run('print main(n, 2); print')
+    p = 22
+    while n < 31:
+        main(n, p)
+        #cProfile.run('print main(n, 2); print')
         n += 1
