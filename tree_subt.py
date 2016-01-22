@@ -35,6 +35,8 @@ def add_subt(strg, ind):
     lin_tree=[]
     for n in range(2,len(str2add)+2):
         cad='mul(%s)' % params[n]
+        # print params
+        # print str2add
         cad=convrt_token(cad)
         cad.append(str2add[n-2])
         lin_tree= lin_tree + cad

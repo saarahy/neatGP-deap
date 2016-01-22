@@ -1,11 +1,79 @@
-#add this imports
+import random
+import tools
+import time
+import funcEval
 from measure_tree import *
 from neat_operators import *
 from speciation import *
 from fitness_sharing import *
 from ParentSelection import *
+from tree_subt import add_subt
+from scipy.optimize.minpack import curve_fit_2
+from tree2func import tree2f
+from eval_str import eval_
+from treesize_h import trees_h,specie_h,best_specie
+from tree_subt import add_subt_cf
 
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, num_p, params,stats=None,
+
+def varAnd(population, toolbox, cxpb, mutpb):
+    """Part of an evolutionary algorithm applying only the variation part
+    (crossover **and** mutation). The modified individuals have their
+    fitness invalidated. The individuals are cloned so returned population is
+    independent of the input population.
+
+    :param population: A list of individuals to vary.
+    :param toolbox: A :class:`~deap.base.Toolbox` that contains the evolution
+                    operators.
+    :param cxpb: The probability of mating two individuals.
+    :param mutpb: The probability of mutating an individual.
+    :returns: A list of varied individuals that are independent of their
+              parents.
+
+    The variation goes as follow. First, the parental population
+    :math:`P_\mathrm{p}` is duplicated using the :meth:`toolbox.clone` method
+    and the result is put into the offspring population :math:`P_\mathrm{o}`.
+    A first loop over :math:`P_\mathrm{o}` is executed to mate consecutive
+    individuals. According to the crossover probability *cxpb*, the
+    individuals :math:`\mathbf{x}_i` and :math:`\mathbf{x}_{i+1}` are mated
+    using the :meth:`toolbox.mate` method. The resulting children
+    :math:`\mathbf{y}_i` and :math:`\mathbf{y}_{i+1}` replace their respective
+    parents in :math:`P_\mathrm{o}`. A second loop over the resulting
+    :math:`P_\mathrm{o}` is executed to mutate every individual with a
+    probability *mutpb*. When an individual is mutated it replaces its not
+    mutated version in :math:`P_\mathrm{o}`. The resulting
+    :math:`P_\mathrm{o}` is returned.
+
+    This variation is named *And* beceause of its propention to apply both
+    crossover and mutation on the individuals. Note that both operators are
+    not applied systematicaly, the resulting individuals can be generated from
+    crossover only, mutation only, crossover and mutation, and reproduction
+    according to the given probabilities. Both probabilities should be in
+    :math:`[0, 1]`.
+    """
+    offspring = [toolbox.clone(ind) for ind in population]
+
+    # Apply crossover and mutation on the offspring
+    for i in range(1, len(offspring), 2):
+        if random.random() < cxpb:
+            offspring[i-1], offspring[i] = toolbox.mate(offspring[i-1], offspring[i])
+            del offspring[i-1].fitness.values, offspring[i].fitness.values
+            offspring[i-1].descendents(0), offspring[i].descendents(0)
+            offspring[i-1].fitness_sharing(0), offspring[i].fitness_sharing(0)
+            offspring[i-1].specie(None), offspring[i].specie(None)
+            offspring[i-1].bestspecie_set(0), offspring[i].bestspecie_set(0)
+            offspring[i-1].LS_applied_set(0), offspring[i].LS_applied_set(0)
+    for i in range(len(offspring)):
+        if random.random() < mutpb:
+            offspring[i], = toolbox.mutate(offspring[i])
+            del offspring[i].fitness.values
+            offspring[i].descendents(0)
+            offspring[i].fitness_sharing(0)
+            offspring[i].specie(None)
+            offspring[i].bestspecie_set(0)
+            offspring[i].LS_applied_set(0)
+    return offspring
+
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg,neat_cx, neat_h,neat_pelit,LS_flag, LS_select, cont_evalf,pset,n_corr, num_p, params,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -68,7 +136,6 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
     .. [Back2000] Back, Fogel and Michalewicz, "Evolutionary Computation 1 :
        Basic Algorithms and Operators", 2000.
     """
-
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
@@ -80,8 +147,17 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         #dentro de su misma especie
         ind_specie(population)
 
+    if funcEval.LS_flag:
+        for ind in population:
+            sizep=len(ind)+2
+            ind.params_set(np.ones(sizep))
+            param=ind.get_params()
 
     # Evaluate the individuals with an invalid fitness
+    # invalid_ind = [ind for ind in population if not ind.fitness.valid]
+    # fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    # for ind, fit  in zip(invalid_ind, fitnesses):
+    #     ind.fitness.values = fit
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
@@ -95,6 +171,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
     if neat_alg:
         SpeciesPunishment(population,params,neat_h)
 
+
     if halloffame is not None:
         halloffame.update(population)
 
@@ -104,17 +181,14 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         print logbook.stream
 
     # Begin the generational process
-    #modificar para el numero de evaluaciones de la funcion objetivo
     for gen in range(1, ngen+1):
-        #break
         if funcEval.cont_evalp > cont_evalf:
             break
         # Select the next generation individuals
         if neat_alg:
             parents=p_selection(population, gen)
         else:
-            offspring = toolbox.select(population, len(population))
-
+            parents = toolbox.select(population, len(population))
 
         # Vary the pool of individuals
         #here will be evaluated the parents pool with
@@ -131,9 +205,9 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         if neat_alg:
             #realiza la especiacion de la poblacion, dado un parametro h
             #species(offspring,h)
-            specie_parents_child(parents,offspring, neat_h)
+            specie_parents_child(parents,offspring,neat_h)
             #asigna a cada individuo de la poblacion, el numero de individuos
-            #dentro de su misma especie
+
             offspring[:]=parents+offspring
             ind_specie(offspring)
 
@@ -141,17 +215,48 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
             del ind.fitness.values
 
         # Evaluate the individuals with an invalid fitness
+        # invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        # fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        #fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
+        # #for ind, fit, fit_test in zip(invalid_ind, fitnesses, fitnesses_test):
+        # for ind, fit in zip(invalid_ind, fitnesses):
+        #     ind.fitness.values = fit
+            #ind.fitness_test.values = fit_test
+                # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
-        for ind, fit, fit_test in zip(invalid_ind, fitnesses, fitnesses_test):
-            funcEval.cont_evalp=funcEval.cont_evalp+1
-            ind.fitness.values = fit
-            ind.fitness_test.values = fit_test
-
+        if funcEval.LS_flag:
+            new_invalid_ind=[]
+            for ind in invalid_ind:
+                strg=ind.__str__() #convierte en str el individuo
+                l_strg=add_subt(strg, ind) #le anade el arbol y lo convierte en arreglo
+                c = tree2f() #crea una instancia de tree2f
+                cd=c.convert(l_strg) #convierte a l_strg en infijo
+                new_invalid_ind.append(cd)
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            fitness_ls= toolbox.map(toolbox.evaluate, new_invalid_ind)
+            fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
+            for ind, fit, fit_test, ls_fit in zip(invalid_ind, fitnesses, fitnesses_test,fitness_ls):
+                if np.isinf(ls_fit) or np.isinf(ls_fit) or np.isnan(ls_fit):
+                    funcEval.cont_evalp=funcEval.cont_evalp+1
+                    ind.fitness.values = fit
+                    ind.fitness_test.values = fit_test
+                    ind.LS_fitness_set(ls_fit[0])
+                else:
+                    funcEval.cont_evalp=funcEval.cont_evalp+1
+                    ind.fitness.values = ls_fit
+                    ind.fitness_test.values = fit_test
+                    ind.LS_fitness_set(fit[0])
+        else:
+            #invalid_ind = [ind for ind in population if not ind.fitness.valid]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
+            for ind, fit, fit_test in zip(invalid_ind, fitnesses, fitnesses_test):
+                funcEval.cont_evalp=funcEval.cont_evalp+1
+                ind.fitness.values = fit
+                ind.fitness_test.values = fit_test
 
         if neat_alg:
-            SpeciesPunishment(offspring,params, neat_h)
+            SpeciesPunishment(offspring,params,neat_h)
 
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
@@ -179,19 +284,51 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
             ###3.La heuristica de LS por cada grupo de especie.
             #por lo tanto necesito sacar el tamano promedio de la poblacion
             if LS_select==1:
-                trees_h(population)
+                trees_h(population, n_corr)
             elif LS_select==2:
-                best_specie(population)
+                best_specie(population, n_corr)
             else:
-                specie_h(population)
+                specie_h(population, n_corr)
+
+
+            new_invalid_ind=[]
+            for ind in invalid_ind:
+                if ind.LS_applied_get():
+                    strg=ind.__str__() #convierte en str el individuo
+                    l_strg=add_subt(strg, ind) #le anade el arbol y lo convierte en arreglo
+                    c = tree2f() #crea una instancia de tree2f
+                    cd=c.convert(l_strg) #convierte a l_strg en infijo
+                    new_invalid_ind.append(cd)
+            invalid_ind = [ind for ind in offspring if ind.LS_applied_get()]
+            fitness_ls= toolbox.map(toolbox.evaluate, new_invalid_ind)
+            for ind,ls_fit in zip(invalid_ind,fitness_ls):
+                if np.isinf(ls_fit) or np.isinf(ls_fit) or np.isnan(ls_fit):
+                    funcEval.cont_evalp=funcEval.cont_evalp+1
+                    ind.LS_fitness_set(ls_fit[0])
+                else:
+                    funcEval.cont_evalp=funcEval.cont_evalp+1
+                    ind.LS_fitness_set(ind.fitness.values[0])
+                    ind.fitness.values=ls_fit
 
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
             print logbook.stream
+        if funcEval.LS_flag:
+            out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
+            for ind in population:
+                strg=ind.__str__() #convierte en str el individuo
+                l_strg=add_subt_cf(strg) #le anade el arbol y lo convierte en arreglo
+                c = tree2f() #crea una instancia de tree2f
+                cd=c.convert(l_strg) #convierte a l_strg en infijo
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),cd,ind))
+            print funcEval.cont_evalp
+        else:
+            out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
+            for ind in population:
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+            print funcEval.cont_evalp
 
-        out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
-        for ind in population:
-            out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
+
     return population, logbook
