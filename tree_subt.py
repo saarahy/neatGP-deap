@@ -14,7 +14,7 @@ def convrt_token(strg):
         str_list = filter(None, text)
         return str_list
 
-def add_subt_cf(strg):
+def add_subt_cf(strg, args):
     st=strg
     str2add=convrt(st)
     str_linear=['add', 'p[0]', 'mul', 'p[1]']
@@ -25,6 +25,16 @@ def add_subt_cf(strg):
         cad.append(str2add[n-2])
         lin_tree= lin_tree + cad
     lin_tree = str_linear + lin_tree
+    if len(args)>0:
+        for id in args:
+            if id in lin_tree:
+                num_x=lin_tree.count(id)
+                for numx in range(num_x):
+                    idx=lin_tree.index(id)
+                    t=lin_tree[idx]
+                    ax=t[0]
+                    an=t[1]
+                    lin_tree[idx]='%s[%s]'%(ax,an)
     return lin_tree
 
 def add_subt(strg, ind):
