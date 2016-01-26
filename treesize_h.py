@@ -26,17 +26,19 @@ def eval_prob(population):
             ps=y
             ind.LS_probability(y)
 
-def trees_h(population, n):
+def trees_h(population, n, pset):
     eval_prob(population)
     for ind in population:
         if random.random()<ind.get_LS_prob():
             strg=ind.__str__() #convierte en str el individuo
-            l_strg=add_subt_cf(strg) #le anade el arbol y lo convierte en arreglo
+            args=[]
+            if len(pset.arguments) > 0:
+                for arg in pset.arguments:
+                    args.append(arg)
+            l_strg=add_subt_cf(strg, args) #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
             xdata,ydata=get_address(n)
-            #outp=open('ls_ind.txt', 'a')
-            #outp.write('\n%s;%s;%s' %(ind.get_params(),ind, cd))
             beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
@@ -47,11 +49,15 @@ def trees_h(population, n):
 
 
 #tomar las especies y aplicarles la heuristica
-def specie_h(population,n):
+def specie_h(population,n, pset):
     for ind in population:
        if ind.bestspecie_get()==1:
             strg=ind.__str__() #convierte en str el individuo
-            l_strg=add_subt_cf(strg) #le anade el arbol y lo convierte en arreglo
+            args=[]
+            if len(pset.arguments) > 0:
+                for arg in pset.arguments:
+                    args.append(arg)
+            l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
             xdata,ydata=get_address(n)
@@ -65,13 +71,17 @@ def specie_h(population,n):
             funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 #como determinar los mejores de cada especie
-def best_specie(population,n):
+def best_specie(population,n, pset):
     eval_prob(population)
     for ind in population:
         if ind.bestspecie_get()==1:
             if random.random()<ind.get_LS_prob():
                 strg=ind.__str__() #convierte en str el individuo
-                l_strg=add_subt_cf(strg) #le anade el arbol y lo convierte en arreglo
+                args=[]
+                if len(pset.arguments) > 0:
+                    for arg in pset.arguments:
+                        args.append(arg)
+                l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
                 xdata,ydata=get_address(n)

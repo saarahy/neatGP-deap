@@ -12,14 +12,14 @@ class tree2f:
                 p='*'
             elif p=='safe_div':
                 p='/'
-            op1 = self.stack.pop ()
-            op2 = self.stack.pop ()
+            op1 = self.stack.pop()
+            op2 = self.stack.pop()
             self.stack.append('(%s%s%s)' % (op1, p, op2))
         elif p == '!':
             op = self.stack.pop()
             self.stack.append ('%s!' % (op) )
-        elif p in ['sin', 'cos', 'tan', 'mylog']:
-            op = self.stack.pop ()
+        elif p in ['sin', 'cos', 'tan', 'mylog', 'tanh','mysqrt', 'mypower2', 'mypower3']:
+            op = self.stack.pop()
             self.stack.append('%s(%s)' % (p, op))
         else:
             self.stack.append (p)
@@ -31,12 +31,12 @@ class tree2f:
         elif p == '!':
             op = self.stack.pop ()
             self.stack.append('%s!' % (op) )
-        elif p in ['sin', 'cos', 'tan', 'mylog']:
+        elif p in ['sin', 'cos', 'tan', 'mylog','tanh','mysqrt']:
             self.stack.append('%s(' % (p))
             self.brackets.append(')')
         else:
             op= self.stack.pop()
-            if not op in ['add(', 'sub(', 'mul(', 'safe_div(','sin(', 'cos(', 'tan(', 'mylog(']:
+            if not op in ['add(', 'sub(', 'mul(', 'safe_div(','sin(', 'cos(', 'tan(', 'mylog(','tanh(','mysqrt(']:
                 self.stack.append('%s%s),' % (op,p))
                 self.brackets.pop()
             else:

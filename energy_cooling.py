@@ -14,8 +14,10 @@ from deap import gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
 from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt, myexp
+from tree2func import tree2f
+from tree_subt import add_subt_cf
 
-pset = gp.PrimitiveSet("MAIN", 5)
+pset = gp.PrimitiveSet("MAIN", 8)
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(operator.mul, 2)
@@ -30,7 +32,7 @@ pset.addPrimitive(mysqrt, 1)
 pset.addPrimitive(np.tan, 1)
 pset.addPrimitive(np.tanh, 1)
 pset.addEphemeralConstant("rand101", lambda: random.uniform(-1, 1))
-pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4')
+pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4', ARG5='x5', ARG6='x6', ARG7='x7',  ARG8='x8')
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -43,43 +45,59 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-direccion="./data_corridas/EnergyCooling/energy_efficiency_Cooling.txt"
-with open(direccion) as spambase:
-    spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
-    num_c = sum(1 for line in open(direccion))
-    num_r = len(next(csv.reader(open(direccion), delimiter=' ', skipinitialspace=True)))
-    Matrix = np.empty((num_r, num_c,))
-    for row, c in zip(spamReader, range(num_c)):
-        for r in range(num_r):
-            try:
-                Matrix[r, c] = row[r]
-            except ValueError:
-                print 'Line {r} is corrupt' , r
-                break
 
-def evalSymbRegKorns(individual, test):
+
+
+def evalSymbRegKorns(individual, test, points):
     func = toolbox.compile(expr=individual)
-    if test:
-        long=int(len(Matrix.T)*.7)
-    else:
-        long=int(len(Matrix.T)*.3)
-    spam_samp = random.sample(Matrix.T, long)
-    vector = [data[10] for data in spam_samp]
-    result = np.sum((func(*np.asarray(spam_samp).T[:10]) - vector)**2)
-    return result/long,
+    vector = [data[8] for data in points]
+    try:
+        result = np.sum((func(*np.asarray(points).T[:8]) - vector)**2)
+    except TypeError:
+        result = np.sum(np.power((np.subtract(func(*np.asarray(points).T[:8]),vector)),2))
+    return result/len(points),
+
+def energy_coolng(n_corr):
+    direccion="./data_corridas/EnergyCooling/energy_efficiency_Cooling.txt"
+    with open(direccion) as spambase:
+        spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
+        num_c = sum(1 for line in open(direccion))
+        num_r = len(next(csv.reader(open(direccion), delimiter=' ', skipinitialspace=True)))
+        Matrix = np.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                try:
+                    Matrix[r, c] = row[r]
+                except ValueError:
+                    print 'Line {r} is corrupt' , r
+                    break
+    long_test=int(len(Matrix.T)*.7)
+    long_train=int(len(Matrix.T)*.3)
+    data_test = random.sample(Matrix.T, long_test)
+    data_train = random.sample(Matrix.T, long_train)
+    np.savetxt('./data_corridas/EnergyCooling/test_%d.txt'%(n_corr), data_test, delimiter=",", fmt="%s")
+    np.savetxt('./data_corridas/EnergyCooling/train_%d.txt'%(n_corr), data_train, delimiter=",", fmt="%s")
+    # outd=open('./data_corridas/EnergyCooling/test_%d.txt'%(n_corr), 'a')
+    # outd.write(data_test[:])
+    # outd.close()
+    # outd=open('./data_corridas/EnergyCooling/train_%d.txt'%(n_corr), 'a')
+    # outd.write(data_train[:])
+    # outd.close()
+    toolbox.register("evaluate", evalSymbRegKorns, test=False, points=data_train)
+    toolbox.register("evaluate_test", evalSymbRegKorns,  test=True, points=data_test)
 
 
 def main(n_corr, p):
-
+    energy_coolng(n_corr)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
-    toolbox.register("mutate", gp.mutUniform, pset=pset)
-    toolbox.register("evaluate", evalSymbRegKorns, test=False)
-    toolbox.register("evaluate_test", evalSymbRegKorns, points=Matrix, test=True)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    # toolbox.register("evaluate", evalSymbRegKorns, test=False, p=n_corr)
+    # toolbox.register("evaluate_test", evalSymbRegKorns,  test=True, p=n_corr)
 
-    pop = toolbox.population(n=500)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -94,12 +112,12 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 30000
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
-    neat_alg = True
+    neat_cx = False
+    neat_alg = False
     neat_pelit = 0.5
     neat_h = 0.15
-    funcEval.LS_flag = True
-    LS_select = 1
+    funcEval.LS_flag = False
+    LS_select = 3
     funcEval.cont_evalp=0
     cont_evalf = 2500000 #contador maximo de de evaluaciones
 
@@ -112,8 +130,17 @@ def main(n_corr, p):
     outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness, hof[2].fitness_test, str(hof[2])))
 
     sortf = sort_fitnessvalues(pop)
-    for ind in sortf:
-        outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s' %(funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
+    if funcEval.LS_flag:
+            for ind in sortf:
+                strg=ind.__str__() #convierte en str el individuo
+                l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
+                c = tree2f() #crea una instancia de tree2f
+                cd=c.convert(l_strg) #convierte a l_strg en infijo
+                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),cd,ind))
+            print funcEval.cont_evalp
+    else:
+            for ind in sortf:
+                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     outfile.close()
     return pop, log, hof
 
