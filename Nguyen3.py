@@ -15,6 +15,8 @@ from deap import gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
 from my_operators import safe_div, mylog
+from tree_subt import add_subt_cf
+from tree2func import tree2f
 
 
 pset = gp.PrimitiveSet("MAIN", 1)
@@ -95,7 +97,7 @@ def main(n_corr, p):
     ngen = 30000
     params = ['best_of_each_specie', 2, 'yes']
     neat_cx = False
-    neat_alg = True
+    neat_alg = False
     neat_pelit = 0.5
     neat_h = 0.15
     funcEval.LS_flag = True
@@ -112,8 +114,20 @@ def main(n_corr, p):
     outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness, hof[2].fitness_test, str(hof[2])))
 
     sortf = sort_fitnessvalues(pop)
-    for ind in sortf:
-        outfile.write('\n%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
+    if funcEval.LS_flag:
+        for ind in sortf:
+            #outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind))
+
+            #out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
+            strg=ind.__str__() #convierte en str el individuo
+            l_strg=add_subt_cf(strg) #le anade el arbol y lo convierte en arreglo
+            c = tree2f() #crea una instancia de tree2f
+            cd=c.convert(l_strg) #convierte a l_strg en infijo
+            outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
+    else:
+                #out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
+        for ind in sortf:
+            outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     outfile.close()
     return pop, log, hof
 
@@ -127,7 +141,7 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    p = 22
+    p = 27
     while n < 31:
         main(n, p)
         #cProfile.run('print main(n, 2); print')
