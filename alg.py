@@ -177,12 +177,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
                 l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
             print funcEval.cont_evalp
     else:
             out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
             for ind in population:
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
@@ -328,10 +328,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
                 l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),cd,ind))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
             print funcEval.cont_evalp
         else:
             #out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
             for ind in population:
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     return population, logbook

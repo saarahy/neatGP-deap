@@ -112,12 +112,12 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 30000
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = False
-    neat_alg = False
+    neat_cx = True
+    neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
-    funcEval.LS_flag = False
-    LS_select = 3
+    funcEval.LS_flag = True
+    LS_select = 1
     funcEval.cont_evalp=0
     cont_evalf = 2500000 #contador maximo de de evaluaciones
 
@@ -136,11 +136,11 @@ def main(n_corr, p):
                 l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),cd,ind))
+                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
             print funcEval.cont_evalp
     else:
             for ind in sortf:
-                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     outfile.close()
     return pop, log, hof
 
