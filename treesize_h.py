@@ -45,8 +45,8 @@ def trees_h(population, n, pset, direccion):
                 ind.LS_applied_set(0)
             else:
                 ind.LS_applied_set(1)
-            ind.params_set(beta_opt)
-            funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                ind.params_set(beta_opt)
+                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 
 #tomar las especies y aplicarles la heuristica
@@ -68,8 +68,8 @@ def specie_h(population,n, pset, direccion):
                 ind.LS_applied_set(0)
             else:
                 ind.LS_applied_set(1)
-            ind.params_set(beta_opt)
-            funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                ind.params_set(beta_opt)
+                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 #como determinar los mejores de cada especie
 def best_specie(population,n, pset, direccion):
@@ -87,11 +87,11 @@ def best_specie(population,n, pset, direccion):
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
                 xdata,ydata=get_address(n,direccion)
 
-                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=250000)
+                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
                 if success not in [1, 2, 3, 4]:
                     ind.LS_applied_set(0)
                 else:
                     ind.LS_applied_set(1)
-                ind.params_set(beta_opt)
-                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                    ind.params_set(beta_opt)
+                    funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
