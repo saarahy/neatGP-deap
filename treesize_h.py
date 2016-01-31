@@ -6,6 +6,7 @@ from scipy.optimize.minpack import curve_fit_2
 from tree2func import tree2f
 from eval_str import eval_
 from g_address import get_address
+#from g_address2 import get_address
 from speciation import ind_specie
 
 
@@ -26,30 +27,30 @@ def eval_prob(population):
             ps=y
             ind.LS_probability(y)
 
-def trees_h(population, n, pset):
+def trees_h(population, n, pset, direccion):
     eval_prob(population)
     for ind in population:
         if random.random()<ind.get_LS_prob():
             strg=ind.__str__() #convierte en str el individuo
             args=[]
-            if len(pset.arguments) > 0:
+            if len(pset.arguments) > 1:
                 for arg in pset.arguments:
                     args.append(arg)
             l_strg=add_subt_cf(strg, args) #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
-            xdata,ydata=get_address(n)
+            xdata,ydata=get_address(n, direccion)
             beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
                 ind.LS_applied_set(1)
-            ind.params_set(beta_opt)
-            funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                ind.params_set(beta_opt)
+                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 
 #tomar las especies y aplicarles la heuristica
-def specie_h(population,n, pset):
+def specie_h(population,n, pset, direccion):
     for ind in population:
        if ind.bestspecie_get()==1:
             strg=ind.__str__() #convierte en str el individuo
@@ -60,18 +61,18 @@ def specie_h(population,n, pset):
             l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
-            xdata,ydata=get_address(n)
+            xdata,ydata=get_address(n,direccion)
 
             beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
                 ind.LS_applied_set(1)
-            ind.params_set(beta_opt)
-            funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                ind.params_set(beta_opt)
+                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 #como determinar los mejores de cada especie
-def best_specie(population,n, pset):
+def best_specie(population,n, pset, direccion):
     eval_prob(population)
     for ind in population:
         if ind.bestspecie_get()==1:
@@ -84,13 +85,13 @@ def best_specie(population,n, pset):
                 l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                xdata,ydata=get_address(n)
+                xdata,ydata=get_address(n,direccion)
 
-                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=250000)
+                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
                 if success not in [1, 2, 3, 4]:
                     ind.LS_applied_set(0)
                 else:
                     ind.LS_applied_set(1)
-                ind.params_set(beta_opt)
-                funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
+                    ind.params_set(beta_opt)
+                    funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 

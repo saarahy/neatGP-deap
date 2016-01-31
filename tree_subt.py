@@ -25,7 +25,7 @@ def add_subt_cf(strg, args):
         cad.append(str2add[n-2])
         lin_tree= lin_tree + cad
     lin_tree = str_linear + lin_tree
-    if len(args)>0:
+    if len(args)>1:
         for id in args:
             if id in lin_tree:
                 num_x=lin_tree.count(id)
