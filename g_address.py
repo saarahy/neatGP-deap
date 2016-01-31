@@ -1,12 +1,11 @@
 import numpy as np
 import csv
-def get_address(n):
+def get_address(n, direccion):
     # direccion1="./data_corridas/Koza/corrida%d/test_x.txt"
     # xdata=np.genfromtxt(direccion1 % n, delimiter=' ')
     # direccion2="./data_corridas/Koza/corrida%d/test_y.txt"
     # ydata = np.genfromtxt(direccion2 % n, delimiter=' ')
     # return xdata,ydata
-    direccion="./data_corridas/EnergyCooling/energy_efficiency_Cooling.txt"
     with open(direccion) as spambase:
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
         num_c = sum(1 for line in open(direccion))
