@@ -42,7 +42,8 @@ def mylog(x):
     with np.errstate(divide='ignore',invalid='ignore'):
         if isinstance(x,np.ndarray):
             x=np.log10(abs(x))
-            x[np.isinf(x)] = 0
+            x[np.isinf(x)] = 0.
+            x[np.isnan(x)] = 0.0
             return x
         else:
             if x == 0:
