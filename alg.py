@@ -73,7 +73,7 @@ def varAnd(population, toolbox, cxpb, mutpb):
             offspring[i].LS_applied_set(0)
     return offspring
 
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, num_p, params, direccion,stats=None,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, num_p, params, direccion, problem,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -157,11 +157,11 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-    fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
-    for ind, fit, fit_test in zip(invalid_ind, fitnesses, fitnesses_test):
+    #fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
+    for ind, fit in zip(invalid_ind, fitnesses):
         funcEval.cont_evalp=funcEval.cont_evalp+1
         ind.fitness.values = fit
-        ind.fitness_test.values = fit_test
+        #ind.fitness_test.values = fit_test
 
     #modificar aptitud en base al fitness sharing y la penalizacion
     #dependiendo del parametro
@@ -170,26 +170,26 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
 
     if halloffame is not None:
         halloffame.update(population)
-    out=open('./Results/EnergyHeating/popgen_%d_%d.txt'%(num_p,n_corr),'a')
-    outp=open('./Results/EnergyHeating/popwp_%d_%d.txt'%(num_p,n_corr),'a')
+    out=open('./Results/%s/popgen_%d_%d.txt'%(problem,num_p,n_corr),'a')
+    outp=open('./Results/%s/popwp_%d_%d.txt'%(problem, num_p,n_corr),'a')
     if funcEval.LS_flag:
             for ind in population:
                 strg=ind.__str__() #convierte en str el individuo
                 l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get()))
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
+                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), 1., ind.LS_fitness_get()))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), 1., ind.LS_fitness_get(),ind.get_params(),cd,ind))
             print funcEval.cont_evalp
     else:
             for ind in population:
-                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get()))
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), 1., ind.LS_fitness_get()))
+                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(0,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), 1., ind.LS_fitness_get(),ind))
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
-    prom=open('./Results/EnergyHeating/prom_%d_%d.txt'%(num_p, n_corr),'a')
+    prom=open('./Results/%s/prom_%d_%d.txt'%(problem, num_p, n_corr),'a')
     if verbose:
-        prom.write('\n%s;%s;%s;%s;%s;%s;%s'%(0,logbook.chapters['size'].select("avg")[-1], logbook.chapters['size'].select("min")[-1],logbook.chapters['fitness'].select("avg")[-1],logbook.chapters['fitness'].select("min")[-1],logbook.chapters['fitness_test'].select("avg")[-1],logbook.chapters['fitness_test'].select("min")[-1]))
+        prom.write('\n%s;%s'%(0,logbook.chapters['size'].select("avg")[-1]))
         print logbook.stream
 
     # Begin the generational process
@@ -242,26 +242,26 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
                 new_invalid_ind.append(cd)
             fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
             fitness_ls= toolbox.map(toolbox.evaluate, new_invalid_ind)
-            fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
-            for ind, fit, fit_test, ls_fit in zip(invalid_ind, fitnesses, fitnesses_test,fitness_ls):
+            #fitnesses_test = toolbox.map(toolbox.evaluate_test, invalid_ind)
+            for ind, fit, ls_fit in zip(invalid_ind, fitnesses, fitness_ls):
                 if np.isinf(ls_fit) or np.isinf(ls_fit) or np.isnan(ls_fit):
                     funcEval.cont_evalp=funcEval.cont_evalp+1
                     ind.fitness.values = fit
-                    ind.fitness_test.values = fit_test
+                    #ind.fitness_test.values = fit_test
                     ind.LS_fitness_set(ls_fit[0])
                 else:
                     funcEval.cont_evalp=funcEval.cont_evalp+1
                     ind.fitness.values = ls_fit
-                    ind.fitness_test.values = fit_test
+                    #ind.fitness_test.values = fit_test
                     ind.LS_fitness_set(fit[0])
         else:
             #invalid_ind = [ind for ind in population if not ind.fitness.valid]
             fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
-            for ind, fit, fit_test in zip(invalid_ind, fitnesses, fitnesses_test):
+            #fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
+            for ind, fit  in zip(invalid_ind, fitnesses):
                 funcEval.cont_evalp=funcEval.cont_evalp+1
                 ind.fitness.values = fit
-                ind.fitness_test.values = fit_test
+                #ind.fitness_test.values = fit_test
 
 
         if neat_alg:
@@ -277,27 +277,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         population[:] = offspring
 
         if LS_flag:
-            #seleccionar a los individuos
-            #como selecciono a los individuos
-            #para eso era la heuristica
-            """ LS method is applied stochastically for each tree, based on a probability
-                determined by the tree size (number of nodes) and the average size of the population
-                mandarle a curve_fit los parametros y la funcion
-                        y=c-(s/as) if 0<=y<=1
-                p(s)=   1          if y>1
-                        0          otherwise
-            """
-            #LS_select
-            ###1. HEuristica por numero de nodos
-            ###2.Los mejores de cada especie.
-            ###3.La heuristica de LS por cada grupo de especie.
-            #por lo tanto necesito sacar el tamano promedio de la poblacion
             if LS_select==1:
-                trees_h(population, n_corr, pset, direccion)
+                trees_h(population, num_p, n_corr, pset, direccion)
             elif LS_select==2:
-                best_specie(population, n_corr,pset, direccion)
+                best_specie(population, num_p,n_corr,pset, direccion)
             else:
-                specie_h(population, n_corr, pset, direccion)
+                specie_h(population, num_p,n_corr, pset, direccion)
 
 
             new_invalid_ind=[]
@@ -323,22 +308,38 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(population), **record)
         if verbose:
-            prom.write('\n%s;%s;%s;%s;%s;%s;%s'%(gen,logbook.chapters['size'].select("avg")[-1], logbook.chapters['size'].select("min")[-1],logbook.chapters['fitness'].select("avg")[-1],logbook.chapters['fitness'].select("min")[-1],logbook.chapters['fitness_test'].select("avg")[-1],logbook.chapters['fitness_test'].select("min")[-1]))
+            prom.write('\n%s;%s'%(gen,logbook.chapters['size'].select("avg")[-1]))
             print logbook.stream
 
+        best=open('./Results/%s/bestind_%d_%d.txt'%(problem, num_p,n_corr),'a')
+        #agarrar al mejor
+        mejor=best_pop(population)
+        fitnesses_test=toolbox.map(toolbox.evaluate_test, [mejor])
+        #mejor.fitness_test.values = fitnesses_test
+        strg=mejor.__str__() #convierte en str el individuo
+        l_strg=add_subt(strg, mejor) #le anade el arbol y lo convierte en arreglo
+        c = tree2f() #crea una instancia de tree2f
+        cd=c.convert(l_strg)
+        fitness_ls= toolbox.map(toolbox.evaluate_test, [cd])
+        best.write('\n%s;%s;%s;%s'%(gen, funcEval.cont_evalp,fitness_ls[0], mejor.fitness.values[0]))
+
         if funcEval.LS_flag:
-            #out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
             for ind in population:
                 strg=ind.__str__() #convierte en str el individuo
                 l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get()))
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
+                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), fitness_ls[0], ind.LS_fitness_get()))
+                #out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
             print funcEval.cont_evalp
         else:
-            #out=open('popgen_%d_%d.txt'%(num_p,n_corr),'a')
             for ind in population:
-                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get()))
-                out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+                outp.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), fitness_ls[0], ind.LS_fitness_get()))
+                #out.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(gen,funcEval.cont_evalp,len(ind), ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+
     return population, logbook
+
+def best_pop(population):
+    orderbyfit=list()
+    orderbyfit=sorted(population, key=lambda ind:ind.fitness.values)
+    return orderbyfit[0]
