@@ -55,9 +55,9 @@ def evalSymbRegKorns(individual, test, points):
         result = np.sum((func(*np.asarray(points).T[:8]) - vector)**2)
     except TypeError:
         result = np.sum(np.power((np.subtract(func(*np.asarray(points).T[:8]),vector)),2))
-    return result/len(points),
+    return np.sqrt(result/len(points)),
 
-def energy_coolng(n_corr):
+def energy_coolng(n_corr,p):
     direccion="./data_corridas/EnergyCooling/energy_efficiency_Cooling.txt"
     with open(direccion) as spambase:
         spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
@@ -69,78 +69,73 @@ def energy_coolng(n_corr):
                 try:
                     Matrix[r, c] = row[r]
                 except ValueError:
-                    print 'Line {r} is corrupt' , r
+                    print 'Line {r} is corrupt', r
                     break
-    long_test=int(len(Matrix.T)*.7)
-    long_train=int(len(Matrix.T)*.3)
+    long_test=int(len(Matrix.T)*.3)
+    long_train=int(len(Matrix.T)*.7)
     data_test = random.sample(Matrix.T, long_test)
     data_train = random.sample(Matrix.T, long_train)
-    np.savetxt('./data_corridas/EnergyCooling/test_%d.txt'%(n_corr), data_test, delimiter=",", fmt="%s")
-    np.savetxt('./data_corridas/EnergyCooling/train_%d.txt'%(n_corr), data_train, delimiter=",", fmt="%s")
-    # outd=open('./data_corridas/EnergyCooling/test_%d.txt'%(n_corr), 'a')
-    # outd.write(data_test[:])
-    # outd.close()
-    # outd=open('./data_corridas/EnergyCooling/train_%d.txt'%(n_corr), 'a')
-    # outd.write(data_train[:])
-    # outd.close()
+    np.savetxt('./data_corridas/EnergyCooling/test_%d_%d.txt'%(p,n_corr), data_test, delimiter=",", fmt="%s")
+    np.savetxt('./data_corridas/EnergyCooling/train_%d_%d.txt'%(p,n_corr), data_train, delimiter=",", fmt="%s")
     toolbox.register("evaluate", evalSymbRegKorns, test=False, points=data_train)
     toolbox.register("evaluate_test", evalSymbRegKorns,  test=True, points=data_test)
 
 
 def main(n_corr, p):
-    energy_coolng(n_corr)
+    direccion="./data_corridas/EnergyCooling/train_%d_%d.txt"
+    energy_coolng(n_corr,p)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-    # toolbox.register("evaluate", evalSymbRegKorns, test=False, p=n_corr)
-    # toolbox.register("evaluate_test", evalSymbRegKorns,  test=True, p=n_corr)
+    toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+    toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+
 
     pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
-    stats_fit_test = tools.Statistics(lambda i: i.fitness_test.values)
-    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size, fitness_test=stats_fit_test)
+    mstats = tools.MultiStatistics(fitness=stats_fit,size=stats_size)
     mstats.register("avg", np.mean)
     mstats.register("std", np.std)
     mstats.register("min", np.min)
     mstats.register("max", np.max)
     cxpb = 0.7
     mutpb = 0.3
-    ngen = 30000
+    ngen = 3000
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
-    neat_alg = True
+    neat_cx = False
+    neat_alg = False
     neat_pelit = 0.5
     neat_h = 0.15
     funcEval.LS_flag = True
     LS_select = 1
     funcEval.cont_evalp=0
-    cont_evalf = 2500000 #contador maximo de de evaluaciones
-
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, stats=mstats, halloffame=hof, verbose=True)
+    cont_evalf = 2500000
+    problem="EnergyCooling"
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
-    outfile.write("\n Best individual is: %s %s %s " %( hof[0].fitness, hof[0].fitness_test, str(hof[0])))
-    outfile.write("\n Best individual is: %s %s %s" % ( hof[1].fitness, hof[1].fitness_test, str(hof[1])))
-    outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness, hof[2].fitness_test, str(hof[2])))
+    outfile.write("\n Best individual is:  %s;%s " %( hof[0].fitness,  str(hof[0])))
+    # outfile.write("\n Best individual is: %s %s %s" % ( hof[1].fitness,  str(hof[1])))
+    # outfile.write("\n Best individual is: %s %s %s" % ( hof[2].fitness,  str(hof[2])))
 
-    sortf = sort_fitnessvalues(pop)
-    if funcEval.LS_flag:
-            for ind in sortf:
-                strg=ind.__str__() #convierte en str el individuo
-                l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
-                c = tree2f() #crea una instancia de tree2f
-                cd=c.convert(l_strg) #convierte a l_strg en infijo
-                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
-            print funcEval.cont_evalp
-    else:
-            for ind in sortf:
-                outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
+    #sortf = sort_fitnessvalues(pop)
+    # if funcEval.LS_flag:
+    #         for ind in sortf:
+    #             strg=ind.__str__() #convierte en str el individuo
+    #             l_strg=add_subt_cf(strg, args=[]) #le anade el arbol y lo convierte en arreglo
+    #             c = tree2f() #crea una instancia de tree2f
+    #             cd=c.convert(l_strg) #convierte a l_strg en infijo
+    #             outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind.get_params(),cd,ind))
+    #         print funcEval.cont_evalp
+    # else:
+    #         for ind in sortf:
+    #             outfile.write('\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' %(len(ind), funcEval.cont_evalp,ind.height, ind.get_specie(), ind.bestspecie_get(), ind.LS_applied_get(),ind.fitness.values[0], ind.get_fsharing(), ind.fitness_test.values[0], ind.LS_fitness_get(),ind))
     outfile.close()
     return pop, log, hof
 
@@ -154,7 +149,7 @@ def run(number, problem):
 
 if __name__ == "__main__":
     n = 1
-    while n < 31:
+    while n < 6:
         #cProfile.run('print main(n, 9); print')
-        main(n, 9)
+        main(n, 97)
         n += 1

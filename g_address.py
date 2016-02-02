@@ -1,15 +1,11 @@
 import numpy as np
 import csv
-def get_address(n, direccion):
-    # direccion1="./data_corridas/Koza/corrida%d/test_x.txt"
-    # xdata=np.genfromtxt(direccion1 % n, delimiter=' ')
-    # direccion2="./data_corridas/Koza/corrida%d/test_y.txt"
-    # ydata = np.genfromtxt(direccion2 % n, delimiter=' ')
-    # return xdata,ydata
+def get_address(p,n, direccion):
+    direccion=direccion%(p,n)
     with open(direccion) as spambase:
-        spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
+        spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
         num_c = sum(1 for line in open(direccion))
-        num_r = len(next(csv.reader(open(direccion), delimiter=' ', skipinitialspace=True)))
+        num_r = len(next(csv.reader(open(direccion), delimiter=',', skipinitialspace=True)))
         Matrix = np.empty((num_r, num_c,))
         for row, c in zip(spamReader, range(num_c)):
             for r in range(num_r):

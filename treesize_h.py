@@ -9,7 +9,7 @@ from g_address import get_address
 #from g_address2 import get_address
 from speciation import ind_specie
 
-
+n=2200
 def eval_prob(population):
     n_nodes=[]
     for ind in population:
@@ -27,7 +27,7 @@ def eval_prob(population):
             ps=y
             ind.LS_probability(y)
 
-def trees_h(population, n, pset, direccion):
+def trees_h(population, p,  n, pset, direccion):
     eval_prob(population)
     for ind in population:
         if random.random()<ind.get_LS_prob():
@@ -39,8 +39,8 @@ def trees_h(population, n, pset, direccion):
             l_strg=add_subt_cf(strg, args) #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
-            xdata,ydata=get_address(n, direccion)
-            beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
+            xdata,ydata=get_address(p, n, direccion)
+            beta_opt, beta_cov, info, msg, success = curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
@@ -50,7 +50,7 @@ def trees_h(population, n, pset, direccion):
 
 
 #tomar las especies y aplicarles la heuristica
-def specie_h(population,n, pset, direccion):
+def specie_h(population, p, n, pset, direccion):
     for ind in population:
        if ind.bestspecie_get()==1:
             strg=ind.__str__() #convierte en str el individuo
@@ -61,9 +61,9 @@ def specie_h(population,n, pset, direccion):
             l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
-            xdata,ydata=get_address(n,direccion)
+            xdata,ydata=get_address(p, n,direccion)
 
-            beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
+            beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=n)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
@@ -72,7 +72,7 @@ def specie_h(population,n, pset, direccion):
                 funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 
 #como determinar los mejores de cada especie
-def best_specie(population,n, pset, direccion):
+def best_specie(population, p, n, pset, direccion):
     eval_prob(population)
     for ind in population:
         if ind.bestspecie_get()==1:
@@ -85,9 +85,9 @@ def best_specie(population,n, pset, direccion):
                 l_strg=add_subt_cf(strg, args)  #le anade el arbol y lo convierte en arreglo
                 c = tree2f() #crea una instancia de tree2f
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
-                xdata,ydata=get_address(n,direccion)
+                xdata,ydata=get_address(p, n,direccion)
 
-                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=400)
+                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=n)
                 if success not in [1, 2, 3, 4]:
                     ind.LS_applied_set(0)
                 else:
