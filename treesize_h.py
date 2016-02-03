@@ -9,7 +9,7 @@ from g_address import get_address
 #from g_address2 import get_address
 from speciation import ind_specie
 
-n=2200
+
 def eval_prob(population):
     n_nodes=[]
     for ind in population:
@@ -40,10 +40,11 @@ def trees_h(population, p,  n, pset, direccion):
             c = tree2f() #crea una instancia de tree2f
             cd=c.convert(l_strg) #convierte a l_strg en infijo
             xdata,ydata=get_address(p, n, direccion)
-            beta_opt, beta_cov, info, msg, success = curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1)
+            beta_opt, beta_cov, info, msg, success = curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1,maxfev=2200)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
+                #print 'LS (%s)'% (info['nfev'])
                 ind.LS_applied_set(1)
                 ind.params_set(beta_opt)
                 funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
@@ -63,10 +64,11 @@ def specie_h(population, p, n, pset, direccion):
             cd=c.convert(l_strg) #convierte a l_strg en infijo
             xdata,ydata=get_address(p, n,direccion)
 
-            beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=n)
+            beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=2200)
             if success not in [1, 2, 3, 4]:
                 ind.LS_applied_set(0)
             else:
+                print 'LS'
                 ind.LS_applied_set(1)
                 ind.params_set(beta_opt)
                 funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
@@ -74,6 +76,7 @@ def specie_h(population, p, n, pset, direccion):
 #como determinar los mejores de cada especie
 def best_specie(population, p, n, pset, direccion):
     eval_prob(population)
+
     for ind in population:
         if ind.bestspecie_get()==1:
             if random.random()<ind.get_LS_prob():
@@ -87,11 +90,13 @@ def best_specie(population, p, n, pset, direccion):
                 cd=c.convert(l_strg) #convierte a l_strg en infijo
                 xdata,ydata=get_address(p, n,direccion)
 
-                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1, maxfev=n)
+                beta_opt, beta_cov, info, msg, success= curve_fit_2(eval_,cd , xdata, ydata, p0=ind.get_params() ,full_output=1,maxfev=2200)
                 if success not in [1, 2, 3, 4]:
+                    print 'LS 2'
                     ind.LS_applied_set(0)
                 else:
                     ind.LS_applied_set(1)
                     ind.params_set(beta_opt)
+                    print 'LS (%s)'% (info['nfev'])
                     funcEval.cont_evalp=funcEval.cont_evalp+info['nfev']
 

@@ -107,16 +107,17 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 3000
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = False
-    neat_alg = False
+    neat_cx = True
+    neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
     funcEval.LS_flag = True
     LS_select = 1
     funcEval.cont_evalp=0
+    num_salto=5000
     cont_evalf = 2500000
     problem="EnergyCooling"
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf,pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf, num_salto, pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
@@ -150,6 +151,6 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 6:
-        #cProfile.run('print main(n, 9); print')
-        main(n, 97)
+        #cProfile.run('print main(n, 93); print')
+        main(n, 9)
         n += 1

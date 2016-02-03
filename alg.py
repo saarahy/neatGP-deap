@@ -73,7 +73,7 @@ def varAnd(population, toolbox, cxpb, mutpb):
             offspring[i].LS_applied_set(0)
     return offspring
 
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,neat_pelit, LS_flag, LS_select, cont_evalf,pset,n_corr, num_p, params, direccion, problem,stats=None,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,neat_pelit, LS_flag, LS_select, cont_evalf, num_salto, pset,n_corr, num_p, params, direccion, problem,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -140,12 +140,17 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
+    #Crear la matriz para llenar los datos
+    num_r=7
+    num_c=(cont_evalf/num_salto)
+    Matrix = np.empty((num_c, num_r,))
+    vector=np.arange(1,cont_evalf+1, num_salto)
+    for i in range(len(vector)):
+        Matrix[i,0]=vector[i]
+
     #asignar especies en cada individuo en la poblacion
     if neat_alg:
-        #realiza la especiacion de la poblacion, dado un parametro h
         species(population,neat_h)
-        #asigna a cada individuo de la poblacion, el numero de individuos
-        #dentro de su misma especie
         ind_specie(population)
 
     if funcEval.LS_flag:
@@ -157,11 +162,28 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-    #fitnesses_test=toolbox.map(toolbox.evaluate_test, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         funcEval.cont_evalp=funcEval.cont_evalp+1
         ind.fitness.values = fit
-        #ind.fitness_test.values = fit_test
+
+    #obtener el mejor de la generacion 0
+    best=open('./Results/%s/bestind_%d_%d.txt'%(problem, num_p,n_corr),'a')
+
+    #agarrar al mejor
+    mejor=best_pop(population)
+    fitnesst_best=toolbox.map(toolbox.evaluate_test, [mejor])
+    best.write('\n%s;%s;%s;%s'%(0, funcEval.cont_evalp,fitnesst_best[0], mejor.fitness.values[0]))
+
+    #comparar le numero de evaluaciones para llenar la matriz
+    idx=0
+    Matrix[idx, 1] = mejor.fitness.values[0]
+    Matrix[idx, 2] = fitnesst_best[0][0]
+    Matrix[idx, 3] = len(mejor)
+    Matrix[idx, 4] = avg_nodes(population)
+    Matrix[idx, 5] = 0.
+    Matrix[idx, 6] = 1 #indicador de que esa columna se lleno
+
+    np.savetxt('./Matrix/idx_%d_%d.txt'%(num_p,n_corr), Matrix, delimiter=",", fmt="%s")
 
     #modificar aptitud en base al fitness sharing y la penalizacion
     #dependiendo del parametro
@@ -283,7 +305,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
                 best_specie(population, num_p,n_corr,pset, direccion)
             else:
                 specie_h(population, num_p,n_corr, pset, direccion)
-
+            print '---',funcEval.cont_evalp
 
             new_invalid_ind=[]
             for ind in invalid_ind:
@@ -315,13 +337,38 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h,n
         #agarrar al mejor
         mejor=best_pop(population)
         fitnesses_test=toolbox.map(toolbox.evaluate_test, [mejor])
-        #mejor.fitness_test.values = fitnesses_test
+        mejor.fitness_test.values = fitnesses_test[0]
         strg=mejor.__str__() #convierte en str el individuo
         l_strg=add_subt(strg, mejor) #le anade el arbol y lo convierte en arreglo
         c = tree2f() #crea una instancia de tree2f
         cd=c.convert(l_strg)
-        fitness_ls= toolbox.map(toolbox.evaluate_test, [cd])
-        best.write('\n%s;%s;%s;%s'%(gen, funcEval.cont_evalp,fitness_ls[0], mejor.fitness.values[0]))
+        fitnesst_best= toolbox.map(toolbox.evaluate_test, [cd])
+        best.write('\n%s;%s;%s;%s'%(gen, funcEval.cont_evalp,fitnesst_best[0], mejor.fitness.values[0]))
+
+        idx_aux=np.searchsorted(Matrix[:,0], funcEval.cont_evalp)
+        Matrix[idx_aux, 1] = mejor.fitness.values[0]
+        Matrix[idx_aux, 2] = fitnesst_best[0][0]
+        Matrix[idx_aux, 3] = len(mejor)
+        Matrix[idx_aux, 4] = avg_nodes(population)
+        Matrix[idx_aux, 5] = gen
+        Matrix[idx_aux, 6] = 1 #indicador de que esa columna se lleno
+
+        id_it=idx_aux-1
+        id_beg=0
+        flag=True
+        flag2=False
+        while flag:
+            if Matrix[id_it,6]==0:
+                id_it=id_it-1
+                flag2=True
+            else:
+                id_beg=id_it
+                flag=False
+        if flag2:
+            x=Matrix[id_beg,1:6]
+            Matrix[id_beg:idx_aux, 1:]=Matrix[id_beg,1:]
+
+        np.savetxt('./Matrix/idx_%d_%d.txt'%(num_p,n_corr), Matrix, delimiter=",", fmt="%s")
 
         if funcEval.LS_flag:
             for ind in population:

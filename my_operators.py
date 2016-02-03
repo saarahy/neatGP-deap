@@ -101,3 +101,11 @@ def undivide(x):
             return 1.0
         else:
             return 1.0/x
+
+def avg_nodes(population):
+    n_nodes=[]
+    for ind in population:
+        n_nodes.append(len(ind))
+    nn_nodes=np.asarray(n_nodes)
+    av_size=np.mean(nn_nodes)
+    return av_size
