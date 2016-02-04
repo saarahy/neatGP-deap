@@ -11,12 +11,15 @@ from functools import partial, wraps
 from inspect import isclass
 from operator import eq, lt
 from neat_gp import *
-#on the beginning of the class just add
-#the parameter 'neat'
+from deap import gp
+######################################
+# GP Data structure                  #
+######################################
 
-#class PrimitiveTree(list, neat):
+# Define the name of type for any types.
+__type__ = object
 
-class PrimitiveTree(list, neat):
+class PrimitiveTree(gp.PrimitiveTree, neat):
     """Tree spefically formated for optimization of genetic
     programming operations. The tree is represented with a
     list where the nodes are appended in a depth-first order.
@@ -170,7 +173,6 @@ class PrimitiveTree(list, neat):
             total += self[end].arity - 1
             end += 1
         return slice(begin, end)
-
 
 def cxOnePoint(ind1, ind2):
     """Randomly select in each individual and exchange each subtree with the

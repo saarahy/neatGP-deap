@@ -1,3 +1,6 @@
+from __future__ import division
+
+
 def initRepeat(container, func, n):
     """Call the function *container* with a generator function corresponding
     to the calling *n* times the function *func*.
