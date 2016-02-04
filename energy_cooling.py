@@ -5,12 +5,14 @@ import csv
 import cProfile
 import funcEval
 import numpy as np
+import neatGPLS
+import init_conf
 from decimal import Decimal
-from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+import gp_conf as neat_gp
 from neat_operators import neatGP
 from ParentSelection import sort_fitnessvalues
 from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt, myexp
@@ -37,12 +39,12 @@ pset.renameArguments(ARG0='x0',ARG1='x1', ARG2='x2', ARG3='x3', ARG4='x4', ARG5=
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("FitnessTest", base.Fitness, weights=(-1.0,))
-creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, fitness_test=creator.FitnessTest)
+creator.create("Individual", neat_gp.PrimitiveTree, fitness=creator.FitnessMin, fitness_test=creator.FitnessTest)
 
 toolbox = base.Toolbox()
 toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+toolbox.register("population", init_conf.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
@@ -86,9 +88,9 @@ def main(n_corr, p):
     energy_coolng(n_corr,p)
 
     toolbox.register("select", tools.selTournament, tournsize=3)
-    toolbox.register("mate", gp.cxOnePoint)
+    toolbox.register("mate", neat_gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
-    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    toolbox.register("mutate", neat_gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
     toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
@@ -107,7 +109,7 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 3000
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
+    neat_cx = False
     neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
@@ -117,7 +119,8 @@ def main(n_corr, p):
     num_salto=5000
     cont_evalf = 2500000
     problem="EnergyCooling"
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf, num_salto, pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
+    pop, log = neatGPLS.neat_GP_LS(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf, num_salto, pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
+    #pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, funcEval.LS_flag, LS_select, cont_evalf, num_salto, pset,n_corr, p, params, direccion,problem,stats=mstats, halloffame=hof, verbose=True)
 
     outfile = open('popfinal_%d_%d.txt' % (p, n_corr), 'w')
 
@@ -152,5 +155,5 @@ if __name__ == "__main__":
     n = 1
     while n < 6:
         #cProfile.run('print main(n, 93); print')
-        main(n, 9)
+        main(n, 92)
         n += 1
