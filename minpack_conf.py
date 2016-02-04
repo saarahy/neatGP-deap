@@ -1,3 +1,10 @@
+import scipy.optimize.minpack as minpack
+import numpy as np
+from numpy import (atleast_1d, dot, take, triu, shape, eye,
+                   transpose, zeros, product, greater, array,
+                   all, where, isscalar, asarray, inf, abs,
+                   finfo, issubdtype, dtype)
+
 def _general_function(params, xdata, ydata, function, strg):
     return function(strg, xdata, *params) - ydata
 
@@ -124,7 +131,7 @@ def curve_fit_2(f,strg, xdata, ydata, p0=None, sigma=None, absolute_sigma=False,
     if sigma is None:
         func = _general_function
     else:
-        func = _weighted_general_function
+        func = minpack._weighted_general_function
         args += (1.0 / asarray(sigma),)
 
     # Remove full_output from kw, otherwise we're passing it in twice.
@@ -276,7 +283,7 @@ def leastsq(func, x0, args=(), Dfun=None, full_output=0,
     n = len(x0)
     if not isinstance(args, tuple):
         args = (args,)
-    shape, dtype = _check_func('leastsq', 'func', func, x0, args, n)
+    shape, dtype = minpack._check_func('leastsq', 'func', func, x0, args, n)
     m = shape[0]
     # if n > m:
     #     raise TypeError('Improper input: N=%s must not exceed M=%s' % (n, m))
@@ -285,16 +292,16 @@ def leastsq(func, x0, args=(), Dfun=None, full_output=0,
     if Dfun is None:
         if maxfev == 0:
             maxfev = 200*(n + 1)
-        retval = _minpack._lmdif(func, x0, args, full_output, ftol, xtol,
+        retval = minpack._minpack._lmdif(func, x0, args, full_output, ftol, xtol,
                                  gtol, maxfev, epsfcn, factor, diag)
     else:
         if col_deriv:
-            _check_func('leastsq', 'Dfun', Dfun, x0, args, n, (n, m))
+            minpack._check_func('leastsq', 'Dfun', Dfun, x0, args, n, (n, m))
         else:
-            _check_func('leastsq', 'Dfun', Dfun, x0, args, n, (m, n))
+            minpack._check_func('leastsq', 'Dfun', Dfun, x0, args, n, (m, n))
         if maxfev == 0:
             maxfev = 100 * (n + 1)
-        retval = _minpack._lmder(func, Dfun, x0, args, full_output, col_deriv,
+        retval = minpack._minpack._lmder(func, Dfun, x0, args, full_output, col_deriv,
                                  ftol, xtol, gtol, maxfev, factor, diag)
 
     errors = {0: ["Improper input parameters.", TypeError],
@@ -326,7 +333,7 @@ def leastsq(func, x0, args=(), Dfun=None, full_output=0,
 
     if info not in [1, 2, 3, 4] and not full_output:
         if info in [5, 6, 7, 8]:
-            warnings.warn(errors[info][0], RuntimeWarning)
+            minpack.warnings.warn(errors[info][0], RuntimeWarning)
         else:
             try:
                 raise errors[info][1](errors[info][0])
@@ -339,11 +346,11 @@ def leastsq(func, x0, args=(), Dfun=None, full_output=0,
         if info in [1, 2, 3, 4]:
             from numpy.dual import inv
             from numpy.linalg import LinAlgError
-            perm = take(eye(n), retval[1]['ipvt'] - 1, 0)
-            r = triu(transpose(retval[1]['fjac'])[:n, :])
-            R = dot(r, perm)
+            perm = minpack.take(minpack.eye(n), retval[1]['ipvt'] - 1, 0)
+            r = minpack.triu(minpack.transpose(retval[1]['fjac'])[:n, :])
+            R = minpack.dot(r, perm)
             try:
-                cov_x = inv(dot(transpose(R), R))
+                cov_x = inv(minpack.dot(minpack.transpose(R), R))
             except (LinAlgError, ValueError):
                 pass
         return (retval[0], cov_x) + retval[1:-1] + (mesg, info)

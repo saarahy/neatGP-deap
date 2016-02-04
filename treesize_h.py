@@ -2,11 +2,10 @@ import numpy as np
 import random
 import funcEval
 from tree_subt import add_subt_cf
-from scipy.optimize.minpack import curve_fit_2
+from minpack_conf import curve_fit_2
 from tree2func import tree2f
 from eval_str import eval_
 from g_address import get_address
-#from g_address2 import get_address
 from speciation import ind_specie
 
 
