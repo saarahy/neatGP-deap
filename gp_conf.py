@@ -5,7 +5,6 @@ import sys
 import warnings
 import numpy as np
 import operator
-import funcEval
 from collections import defaultdict, deque
 from functools import partial, wraps
 from inspect import isclass
@@ -19,6 +18,7 @@ from deap import gp
 # Define the name of type for any types.
 __type__ = object
 
+
 class PrimitiveTree(gp.PrimitiveTree, neat):
     """Tree spefically formated for optimization of genetic
     programming operations. The tree is represented with a
@@ -29,15 +29,12 @@ class PrimitiveTree(gp.PrimitiveTree, neat):
     """
     def __init__(self, content):
         list.__init__(self, content)
-        self.tspecie=None
-        self.descendent=None
-        self.fitness_h=None
-        self.nspecie=None
-        self.LS_prob=None
-        self.params=None
-        self.best_ind=None
-        self.ls_ind=None
-        self.ls_fitness=None
+        self.tspecie = None
+        self.descendent = None
+        self.fitness_h = None
+        self.nspecie = None
+        self.params = None
+        self.best_ind = None
 
     def __deepcopy__(self, memo):
         new = self.__class__(self)
@@ -117,7 +114,7 @@ class PrimitiveTree(gp.PrimitiveTree, neat):
                                     .format(primitive, primitive.ret, type_))
 
                 expr.append(primitive)
-                if isinstance(primitive, Primitive):
+                if isinstance(primitive, gp.Primitive):
                     ret_types.extendleft(reversed(primitive.args))
             else:
                 try:
@@ -133,7 +130,7 @@ class PrimitiveTree(gp.PrimitiveTree, neat):
                                     "match the expected one: {}."
                                     .format(token, type(token), type_))
 
-                expr.append(Terminal(token, False, type_))
+                expr.append(gp.Terminal(token, False, type_))
         return cls(expr)
 
     @property
@@ -174,6 +171,7 @@ class PrimitiveTree(gp.PrimitiveTree, neat):
             end += 1
         return slice(begin, end)
 
+
 def cxOnePoint(ind1, ind2):
     """Randomly select in each individual and exchange each subtree with the
     point as root between each individual.
@@ -208,25 +206,10 @@ def cxOnePoint(ind1, ind2):
         slice1 = ind1.searchSubtree(index1)
         slice2 = ind2.searchSubtree(index2)
 
-        if funcEval.LS_flag:
-            a=slice1.start
-            b=slice1.stop
-            c=slice2.start
-            d=slice2.stop
-            params1=ind1.get_params()
-            params2=ind2.get_params()
-            params1=params1.tolist()
-            params2=params2.tolist()
-            temp_p=params1[a+2:b+2]
-            params1[a+2:b+2]=params2[c+2:d+2]
-            params2[c+2:d+2]=temp_p
-            params1=np.asarray(params1)
-            params2=np.asarray(params2)
-            ind1.params_set(params1)
-            ind2.params_set(params2)
         ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
 
     return ind1, ind2
+
 
 def mutUniform(individual, expr, pset):
     """Randomly select a point in the tree *individual*, then replace the
@@ -241,15 +224,5 @@ def mutUniform(individual, expr, pset):
     index = random.randrange(len(individual))
     slice_ = individual.searchSubtree(index)
     type_ = individual[index].ret
-    xp=expr(pset=pset, type_=type_)
-    if funcEval.LS_flag:
-            a=slice_.start
-            b=slice_.stop
-            params1=individual.get_params()
-            params1=params1.tolist()
-            params2=np.ones(len(xp))
-            params1[a+2:b+2]=params2
-            params1=np.asarray(params1)
-            individual.params_set(params1)
-    individual[slice_] = xp#expr(pset=pset, type_=type_)
+    individual[slice_] = expr(pset=pset, type_=type_)
     return individual,
