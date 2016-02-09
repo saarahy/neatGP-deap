@@ -1,68 +1,46 @@
 import random
 import copy
-import funcEval
-import numpy as np
 from measure_tree import *
 
 
 def neatcx(ind1, ind2, toolbox):
-    hijo=copy.deepcopy(ind1)
-    flag=0
-    n=0
-    while n<3:
-        e1,e2=ext_node(hijo,ind2)
-        l1,l2=int_node(hijo,ind2)
-        for i in range(len(l1)): #cambio de nodo interno
-            if random.random()<0.5:
-                if funcEval.LS_flag:
-                    params_2=ind2.get_params()
-                    params_1=hijo.get_params()
-                    params_1[i]=params_2[i]
-                    hijo.params_set(params_1)
-                hijo[l1[i][0]]=l2[i][1]
-                flag=1
-        for i in e1: #camio de nodos externos
-            if random.random()<0.5 or flag==0:
+    hijo = copy.deepcopy(ind1)
+    flag = 0
+    n = 0
+    while n < 10:
+        e1, e2 = ext_node(hijo,ind2)
+        l1, l2 = int_node(hijo,ind2)
+        for i in range(len(l1)):  # change of internal nodes
+            if random.random() < 0.5:
+                hijo[l1[i][0]] = l2[i][1]
+                flag = 1
+        for i in e1:  # change of external nodes
+            if random.random() < 0.5 or flag == 0:
                 e=random.choice(e2)
-                if len(ind1)==1:
-                    slice1=hijo.searchSubtree(0)
+                if len(ind1) == 1:
+                    slice1 = hijo.searchSubtree(0)
                 else:
-                    slice1=hijo.searchSubtree(i)
-                if len(ind2)==1:
-                    slice2=ind2.searchSubtree(0)
+                    slice1 = hijo.searchSubtree(i)
+                if len(ind2) == 1:
+                    slice2 = ind2.searchSubtree(0)
                 else:
-                    slice2=ind2.searchSubtree(e)
-                if funcEval.LS_flag:
-                    a=slice1.start
-                    b=slice1.stop
-                    c=slice2.start
-                    d=slice2.stop
-                    params1=hijo.get_params()
-                    params2=ind2.get_params()
-                    params1=params1.tolist()
-                    params2=params2.tolist()
-                    temp_p=params1[a+2:b+2]
-                    params1[a+2:b+2]=params2[c+2:d+2]
-                    params2[c+2:d+2]=temp_p
-                    params1=np.asarray(params1)
-                    params2=np.asarray(params2)
-                    hijo.params_set(params1)
-                    ind2.params_set(params2)
-                hijo[slice1], ind2[slice2]=ind2[slice2], hijo[slice1]
+                    slice2 = ind2.searchSubtree(e)
+                hijo[slice1], ind2[slice2] = ind2[slice2], hijo[slice1]
                 break
-        if hijo==ind1 or hijo==ind2:
-            n+=1
+        if hijo == ind1 or hijo == ind2:
+            n += 1
         else:
             break
-    if hijo==ind1 or hijo==ind2:
-        n=0
-        while n<10:
-            off=toolbox.mutate(hijo)
-            if hijo==ind1 or hijo==ind2:
-                n+=1
+    if hijo == ind1 or hijo == ind2:
+        n = 0
+        while n < 10:
+            off = toolbox.mutate(hijo)
+            if hijo == ind1 or hijo == ind2:
+                n += 1
             else:
                 break
     return hijo
+
 
 def int_node(ind1, ind2):
     cont1=0
@@ -112,6 +90,7 @@ def int_node(ind1, ind2):
                     cont2+=long
                     cont1+=1
     return label1,label2
+
 
 def ext_node(ind1, ind2):
     cont1=0
@@ -166,6 +145,7 @@ def ext_node(ind1, ind2):
                         cont1+=1
     return edg1,edg2
 
+
 def crosspoints(tree1, tree2):
     nodo=0
     lista_nivel=list()
@@ -204,14 +184,16 @@ def crosspoints(tree1, tree2):
                 break
     return nodo, max(lista_nivel)
 
-def grupo(exp,nivel):
+
+def grupo(exp, nivel):
     grupo=list()
     for i in exp:
         if i[1]==nivel:
             grupo.append(i)
     return grupo
 
-def tot_grpo(exp,nivel):
+
+def tot_grpo(exp, nivel):
     total=0
     for i in exp:
         if i[1]==nivel:
