@@ -10,6 +10,7 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+#from deap import algorithms
 import gp_conf as neat_gp
 from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt, myexp
 
@@ -45,12 +46,9 @@ toolbox.register("compile", gp.compile, pset=pset)
 
 def evalSymbReg(individual, test, points):
     func = toolbox.compile(expr=individual)
-    vector = [data[8] for data in points]
-    try:
-        result = np.sum((func(*np.asarray(points).T[:8]) - vector)**2)
-    except TypeError:
-        result = np.sum(np.power((np.subtract(func(*np.asarray(points).T[:8]),vector)),2))
-    return np.sqrt(result/len(points)),
+    vector = points[8]#[data[8] for data in points]
+    result = np.sum((func(*np.asarray(points)[:8]) - vector)**2)
+    return np.sqrt(result/len(points[0])),
 
 
 def energy_coolng(n_corr,p):
@@ -78,48 +76,49 @@ def energy_coolng(n_corr,p):
             long_test=int(len(Matrix.T)*.3)
             data_test = random.sample(Matrix.T, long_test)
             np.savetxt(n_archivot, data_test, delimiter=",", fmt="%s")
-    else:
-        with open(n_archivo) as spambase:
-            spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
-            num_c = sum(1 for line in open(n_archivo))
-            num_r = len(next(csv.reader(open(n_archivo), delimiter=',', skipinitialspace=True)))
-            Matrix = np.empty((num_r, num_c,))
-            for row, c in zip(spamReader, range(num_c)):
-                for r in range(num_r):
-                    try:
-                        Matrix[r, c] = row[r]
-                    except ValueError:
-                        print 'Line {r} is corrupt' , r
-                        break
-            data_train=Matrix[:]
-        with open(n_archivot) as spambase:
-            spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
-            num_c = sum(1 for line in open(n_archivot))
-            num_r = len(next(csv.reader(open(n_archivot), delimiter=',', skipinitialspace=True)))
-            Matrix = np.empty((num_r, num_c,))
-            for row, c in zip(spamReader, range(num_c)):
-                for r in range(num_r):
-                    try:
-                        Matrix[r, c] = row[r]
-                    except ValueError:
-                        print 'Line {r} is corrupt' , r
-                        break
-            data_test=Matrix[:]
+
+    with open(n_archivo) as spambase:
+        spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
+        num_c = sum(1 for line in open(n_archivo))
+        num_r = len(next(csv.reader(open(n_archivo), delimiter=',', skipinitialspace=True)))
+        Matrix = np.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                try:
+                    Matrix[r, c] = row[r]
+                except ValueError:
+                    print 'Line {r} is corrupt' , r
+                    break
+        data_train=Matrix[:]
+    with open(n_archivot) as spambase:
+        spamReader = csv.reader(spambase,  delimiter=',', skipinitialspace=True)
+        num_c = sum(1 for line in open(n_archivot))
+        num_r = len(next(csv.reader(open(n_archivot), delimiter=',', skipinitialspace=True)))
+        Matrix = np.empty((num_r, num_c,))
+        for row, c in zip(spamReader, range(num_c)):
+            for r in range(num_r):
+                try:
+                    Matrix[r, c] = row[r]
+                except ValueError:
+                    print 'Line {r} is corrupt' , r
+                    break
+        data_test=Matrix[:]
     toolbox.register("evaluate", evalSymbReg, test=False, points=data_train)
     toolbox.register("evaluate_test", evalSymbReg,  test=True, points=data_test)
 
 
 def main(n_corr, p):
     energy_coolng(n_corr, p)
-
-    toolbox.register("select", tools.selTournament, tournsize=3)
-    toolbox.register("mate", neat_gp.cxOnePoint)
+    pop_size=500
+    #toolbox.register("select",selElitistAndTournament, k_elitist=int(0.1*pop_size), k_tournament=pop_size - int(0.1*pop_size), tournsize=3)
+    toolbox.register("select",tools.selTournament, tournsize=3)
+    toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
-    toolbox.register("mutate", neat_gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
     toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=pop_size)
     hof = tools.HallOfFame(3)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -131,7 +130,7 @@ def main(n_corr, p):
     mstats.register("max", np.max)
     cxpb = 0.7
     mutpb = 0.3
-    ngen = 3000
+    ngen = 100
     params = ['best_of_each_specie', 2, 'yes']
     neat_cx = True
     neat_alg = True
@@ -139,7 +138,7 @@ def main(n_corr, p):
     neat_h = 0.15
     problem = "EnergyCooling"
     pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, p, params, problem, stats=mstats, halloffame=hof, verbose=True)
-
+    #pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, problem, p, n_corr,stats=mstats, halloffame=hof, verbose=True)
     return pop, log, hof
 
 
@@ -154,5 +153,5 @@ if __name__ == "__main__":
     n = 1
     while n < 6:
         #cProfile.run('print main(n, 93); print')
-        main(n, 92)
+        main(n, 9)
         n += 1

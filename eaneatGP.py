@@ -50,14 +50,13 @@ def varAnd(population, toolbox, cxpb, mutpb):
             offspring[i-1], offspring[i] = toolbox.mate(offspring[i-1], offspring[i])
             del offspring[i-1].fitness.values, offspring[i].fitness.values
             offspring[i-1].bestspecie_set(0), offspring[i].bestspecie_set(0)
-            offspring[i-1].LS_applied_set(0), offspring[i].LS_applied_set(0)
 
     for i in range(len(offspring)):
         if random.random() < mutpb:
             offspring[i], = toolbox.mutate(offspring[i])
             del offspring[i].fitness.values
             offspring[i].bestspecie_set(0)
-            offspring[i].LS_applied_set(0)
+
 
     return offspring
 
@@ -146,7 +145,8 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     #  take the best on the population
     best_ind = best_pop(population)
     fitnesst_best = toolbox.map(toolbox.evaluate_test, [best_ind])
-    best.write('\n%s;%s;%s;%s;%s' % (0, fitnesst_best[0], best_ind.fitness.values[0], len(best_ind), avg_nodes(population)))
+    best_ind.fitness_test.values=fitnesst_best[0]
+    best.write('\n%s;%s;%s;%s;%s' % (0, best_ind.fitness_test.values[0], best_ind.fitness.values[0], len(best_ind), avg_nodes(population)))
     best_st.write('\n%s;%s' % (0, best_ind))
 
     if neat_alg:  # applying fitness sharing
@@ -164,7 +164,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     for gen in range(1, ngen+1):
 
         if neat_alg:  # select set of parents
-            parents=p_selection(population, gen)
+            parents = p_selection(population, gen)
         else:
             parents = toolbox.select(population, len(population))
 
@@ -172,7 +172,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
             n = len(parents)
             mut = 1
             cx = 1
-            offspring = neatGP(toolbox,parents,cxpb,mutpb,n,mut,cx,neat_pelit)
+            offspring = neatGP(toolbox, parents, cxpb, mutpb, n, mut, cx, neat_pelit)
         else:
             offspring = varAnd(parents, toolbox, cxpb, mutpb)
 
@@ -209,7 +209,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
         best_ind = best_pop(population)
         fitnesses_test = toolbox.map(toolbox.evaluate_test, [best_ind])
         best_ind.fitness_test.values = fitnesses_test[0]
-        best.write('\n%s;%s;%s;%s;%s'%(gen, fitnesst_best[0], best_ind.fitness.values[0], len(best_ind), avg_nodes(population)))
+        best.write('\n%s;%s;%s;%s;%s'%(gen, best_ind.fitness_test.values[0], best_ind.fitness.values[0], len(best_ind), avg_nodes(population)))
         best_st.write('\n%s;%s' % (gen, best_ind))
 
     return population, logbook
