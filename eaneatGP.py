@@ -23,8 +23,6 @@ def varOr(population, toolbox, cxpb, mutpb):
             del offspring1.fitness.values
             del offspring2.fitness.values
             offspring1.bestspecie_set(0), offspring2.bestspecie_set(0)
-            offspring1.LS_applied_set(0), offspring2.LS_applied_set(0)
-            offspring1.LS_fitness_set(None), offspring2.LS_fitness_set(None)
             offspring1.off_cx_set(1), offspring2.off_cx_set(1)
             offspring.append(offspring1)
             offspring.append(offspring2)
@@ -34,8 +32,6 @@ def varOr(population, toolbox, cxpb, mutpb):
                 offspring1, = toolbox.mutate(new_pop[i])
                 del offspring1.fitness.values
                 offspring1.bestspecie_set(0)
-                offspring1.LS_applied_set(0)
-                offspring1.LS_fitness_set(None)
                 offspring1.off_mut_set(1)
                 offspring.append(offspring1)
 
