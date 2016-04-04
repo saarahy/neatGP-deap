@@ -117,11 +117,8 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     :param neat_cx: wheter or not to use neatGP cx
     :param neat_h: indicate the distance allowed between each specie
     :param neat_pelit: probability of being elitist, it's used in the neat cx and mutation
-    :param LS_flag: wheter or not to use LocalSearchGP
-    :param LS_select: indicate the kind of selection to use the LSGP on the population.
-    :param cont_evalf: contador maximo del numero de evaluaciones
     :param n_corr: run number just to wirte the txt file
-    :param p: problem number just to wirte the txt file
+    :param num_p: problem number just to wirte the txt file
     :param params:indicate the params for the fitness sharing, the diffetent
                     options are:
                     -DontPenalize(str): 'best_specie' or 'best_of_each_specie'
@@ -130,6 +127,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
                         2.penalization fitness sharing
                         3.new penalization
                     -ShareFitness(str): 'yes' or 'no'
+    :param problem: (str) name of the problem.
     :param stats: A :class:`~deap.tools.Statistics` object that is updated
                   inplace, optional.
     :param halloffame: A :class:`~deap.tools.HallOfFame` object that will
