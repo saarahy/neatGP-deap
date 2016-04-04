@@ -46,17 +46,17 @@ class neat:
     def bestspecie_get(self):
         return self.best_ind
 
-    def LS_applied_set(self, value):
-        self.ls_ind=value
+    def off_cx_set(self, value):
+        self.off_cx = value
 
-    def LS_applied_get(self):
-        return self.ls_ind
+    def off_cx_get(self):
+        return self.off_cx
 
-    def LS_fitness_set(self,value):
-        self.ls_fitness=value
+    def off_mut_set(self, value):
+        self.off_mut = value
 
-    def LS_fitness_get(self):
-        return self.ls_fitness
+    def off_mut_get(self):
+        return self.off_mut
 
 class pop_param:
     def save_ind(self):

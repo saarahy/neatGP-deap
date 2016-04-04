@@ -48,11 +48,11 @@ def evalSymbReg(individual, test, points):
     return np.sqrt(result/len(points[0])),
 
 
-def energy_coolng(n_corr,p):
-    n_archivot = './data_corridas/EnergyCooling/test_%d_%d.txt' % (p, n_corr)
-    n_archivo = './data_corridas/EnergyCooling/train_%d_%d.txt' % (p, n_corr)
+def energy_coolng(n_corr, num_p, problem, name_database):
+    n_archivot = './data_corridas/%s/test_%d_%d.txt' % (problem, num_p, n_corr)
+    n_archivo = './data_corridas/%s/train_%d_%d.txt' % (problem, num_p, n_corr)
     if not (os.path.exists(n_archivo) or os.path.exists(n_archivot)):
-        direccion = "./data_corridas/EnergyCooling/energy_efficiency_Cooling.txt"
+        direccion = "./data_corridas/%s/%s.txt" %(problem, name_database)
         with open(direccion) as spambase:
             spamReader = csv.reader(spambase,  delimiter=' ', skipinitialspace=True)
             num_c = sum(1 for line in open(direccion))
@@ -104,9 +104,14 @@ def energy_coolng(n_corr,p):
     toolbox.register("evaluate_test", evalSymbReg,  test=True, points=data_test)
 
 
-def main(n_corr, p):
-    energy_coolng(n_corr, p)
+def main(n_corr, num_p):
+    problem = "EnergyCooling"
+    name_database="energy_efficiency_Cooling"
     pop_size = 500
+
+    energy_coolng(n_corr, num_p, problem, name_database)
+
+
     toolbox.register("select",tools.selTournament, tournsize=3)
     toolbox.register("mate", neat_gp.cxSubtree)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
@@ -128,12 +133,12 @@ def main(n_corr, p):
     mutpb = 0.3
     ngen = 100
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = True
-    neat_alg = True
+    neat_cx = False
+    neat_alg = False
     neat_pelit = 0.5
     neat_h = 0.15
-    problem = "EnergyCooling"
-    pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, p, params, problem, stats=mstats, halloffame=hof, verbose=True)
+
+    pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, num_p, params, problem, stats=mstats, halloffame=hof, verbose=True)
     return pop, log, hof
 
 
@@ -145,7 +150,9 @@ def run(number, problem):
 
 
 if __name__ == "__main__":
-    n = 1
-    while n < 6:
-        main(n, 9)
-        n += 1
+    n_corr_min = 1
+    n_corr_max = 2
+    num_p = 9
+    while n_corr_min <= n_corr_max:
+        main(n_corr_min, num_p)
+        n_corr_min += 1
