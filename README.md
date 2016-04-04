@@ -11,7 +11,7 @@ The previous software that you'll need are: </br>
 
 </br>
 </br>
-New Status:<br>
+[Apr/2016]<b>New Status:</b><br>
 There's a modification on crossover and mutation, previously we could make a crossover AND mutation to the same individual, however we modified the algorithm to do it like a standard GP, where the individual pass to the crossover OR mutation given a probability.
 </br>
 </br>
