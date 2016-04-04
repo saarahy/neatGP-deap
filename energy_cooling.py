@@ -1,7 +1,6 @@
 import operator
 import random
 import csv
-import cProfile
 import numpy as np
 import eaneatGP
 import init_conf
@@ -10,7 +9,6 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
-#from deap import algorithms
 import gp_conf as neat_gp
 from my_operators import safe_div, mylog, mypower2, mypower3, mysqrt, myexp
 
@@ -22,7 +20,6 @@ pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(safe_div, 2)
 pset.addPrimitive(np.cos, 1)
 pset.addPrimitive(np.sin, 1)
-#pset.addPrimitive(myexp, 1)
 pset.addPrimitive(mylog, 1)
 pset.addPrimitive(mypower2, 1)
 pset.addPrimitive(mypower3, 1)
@@ -109,10 +106,9 @@ def energy_coolng(n_corr,p):
 
 def main(n_corr, p):
     energy_coolng(n_corr, p)
-    pop_size=500
-    #toolbox.register("select",selElitistAndTournament, k_elitist=int(0.1*pop_size), k_tournament=pop_size - int(0.1*pop_size), tournsize=3)
+    pop_size = 500
     toolbox.register("select",tools.selTournament, tournsize=3)
-    toolbox.register("mate", gp.cxOnePoint)
+    toolbox.register("mate", neat_gp.cxSubtree)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=3)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
     toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
@@ -138,7 +134,6 @@ def main(n_corr, p):
     neat_h = 0.15
     problem = "EnergyCooling"
     pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, p, params, problem, stats=mstats, halloffame=hof, verbose=True)
-    #pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, problem, p, n_corr,stats=mstats, halloffame=hof, verbose=True)
     return pop, log, hof
 
 
@@ -152,6 +147,5 @@ def run(number, problem):
 if __name__ == "__main__":
     n = 1
     while n < 6:
-        #cProfile.run('print main(n, 93); print')
         main(n, 9)
         n += 1

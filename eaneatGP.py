@@ -179,7 +179,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
 
     # save data for the best individual
     best = open('./Results/%s/bestind_%d_%d.txt'%(problem, num_p, n_corr), 'a')
-    best_st = open('./Results/%s/bestind_string_%d_%d.txt'%(problem, num_p, n_corr), 'a')
+    best_st = open('./Results/%s/bestind_string_%d_%d.txt' % (problem, num_p, n_corr), 'a')
 
     #  take the best on the population
     best_ind = best_pop(population)
@@ -202,6 +202,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     # Begin the generational process
     for gen in range(1, ngen+1):
 
+        best_ind = copy.deepcopy(best_pop(population))
         if neat_alg:  # select set of parents
             parents = p_selection(population, gen)
         else:
@@ -220,14 +221,21 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
             offspring[:] = parents+offspring
             ind_specie(offspring)
 
-        for ind in offspring:
-            del ind.fitness.values
+            # Evaluate the individuals with an invalid fitness
+            invalid_ind = [ind for ind in offspring]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
+        else:
+            invalid_ind = [ind for ind in offspring]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+            orderbyfit = sorted(offspring, key=lambda ind: ind.fitness.values)
+
+            if best_ind.fitness.values[0] <= orderbyfit[0].fitness.values[0]:
+                offspring[:] = [best_ind] + orderbyfit[:len(population) - 1]
 
         if neat_alg:
             SpeciesPunishment(offspring, params, neat_h)
