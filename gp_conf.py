@@ -35,6 +35,8 @@ class PrimitiveTree(gp.PrimitiveTree, neat):
         self.nspecie = None
         self.params = None
         self.best_ind = None
+        self.off_cx = None
+        self.off_mut = None
 
     def __deepcopy__(self, memo):
         new = self.__class__(self)
