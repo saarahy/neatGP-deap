@@ -52,9 +52,17 @@ def set_numind(ind,species):
         if species[i][0]==ind.get_specie() and ind.num_specie!=None:
             ind.num_specie(species[i][1])
 
-#revisa si algun individuo de la poblacion
-#se encuentra sin especie y le asigna una
-def species(population, h):
+
+def species(population, h, beta):
+    """
+        This is the speciation method.
+        This method compare each individual with the rest
+        of the population to assign it a specie.
+
+        :param population: set of individuals without specie
+        :param h: distance measure
+        :return: a population with specie
+        """
     num_specie=count_species(population)
     for ind in population:
         if ind.get_specie()==None:
@@ -63,7 +71,7 @@ def species(population, h):
             else:
                 for ind1 in population:
                     if ind1.get_specie()!=None:
-                        if distance(ind,ind1)<=h:
+                        if distance(ind,ind1, beta)<=h:
                             ind.specie(ind1.get_specie())
                             break
                 if ind.get_specie()==None:
@@ -71,7 +79,7 @@ def species(population, h):
                     num_specie+=1
     return population
 
-#asignar la especie de un individuo especifico
+
 def specie_ind(population,ind, h):
     if (len(ind)==1):
         ind.specie(1)
@@ -86,25 +94,32 @@ def specie_ind(population,ind, h):
             ind.specie(num_specie+1)
     return ind
 
-#asignar especies de padres a hijos
+
+
 def specie_parents_child(parents, offspring, h):
+    """
+        This method assign the specie to each children.
+        The assignation of the specie depends of the specie of the parent.
+        :param parents: set of parents
+        :param offspring: set of descendents without specie
+        :param h: distace to compare, deafult .15
+        :return: A set of descendent with specie.
+    """
     n_esp=count_species(parents)
     for ind in offspring:
-        if ind.get_specie()==None:
-            if (len(ind)==1):
+        if ind.get_specie() is None:
+            if len(ind) == 1:
                 ind.specie(1)
             else:
                 for parent in parents:
-                    if parent.get_specie()!=None:
+                    if parent.get_specie() is not None:
                         if distance(ind, parent)<=h:
                             ind.specie(parent.get_specie())
                             break
-                if ind.get_specie()==None:
+                if ind.get_specie() is None:
                     ind.specie(n_esp+1)
-                    n_esp+=1
-                    #parents.append(ind)
-                    #offspring.remove(ind)
-    return offspring#parents
+                    n_esp += 1
+    return offspring
 
 
 

@@ -164,7 +164,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
     if neat_alg:  # assign specie to each individual on the population
-        species(population,neat_h)
+        species(population,neat_h, beta)
         ind_specie(population)
 
     # Evaluate the individuals with an invalid fitness
@@ -213,7 +213,7 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
             offspring = varOr(parents, toolbox, cxpb, mutpb)
 
         if neat_alg:  # Assign species
-            specie_parents_child(parents, offspring, neat_h)
+            specie_parents_child(parents, offspring, neat_h, beta)
             offspring[:] = parents+offspring
             ind_specie(offspring)
 
