@@ -13,8 +13,11 @@ The previous software that you'll need are: </br>
 </br>
 [Apr/2016]<b>New Status:</b><br>
 There's a modification on crossover and mutation, previously we could make a crossover AND mutation to the same individual, however we modified the algorithm to do it like a standard GP, where the individual pass to the crossover OR mutation given a probability.
+
+[Jun/2017]<b>New Update [Thanks to Aditya Rawal]:</b><br>
+There's a modification on measure_tree.py file on the compare tree method. The method was not calculating the correct 'structure share' between two trees.
 </br>
 </br>
 And that's all. <br>
-If you have a problem please contact me: pjuarez@tree-lab.org <br>
+If you have a problem please contact me: juarez.s.perla[at]gmail.com <br>
 Regards!
