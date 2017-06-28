@@ -96,7 +96,7 @@ def specie_ind(population,ind, h):
 
 
 
-def specie_parents_child(parents, offspring, h):
+def specie_parents_child(parents, offspring, h, beta):
     """
         This method assign the specie to each children.
         The assignation of the specie depends of the specie of the parent.
@@ -113,7 +113,7 @@ def specie_parents_child(parents, offspring, h):
             else:
                 for parent in parents:
                     if parent.get_specie() is not None:
-                        if distance(ind, parent)<=h:
+                        if distance(ind, parent, beta) <= h:
                             ind.specie(parent.get_specie())
                             break
                 if ind.get_specie() is None:

@@ -1,5 +1,6 @@
 import random
 import copy
+import os
 from deap import tools
 from neat_operators import neatGP
 from speciation import ind_specie, species, specie_parents_child
@@ -97,8 +98,13 @@ def varAnd(population, toolbox, cxpb, mutpb):
 
     return offspring
 
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
-def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, num_p, params, problem, stats=None,
+
+def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, num_p, params, problem, beta,stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -159,6 +165,13 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     .. [Back2000] Back, Fogel and Michalewicz, "Evolutionary Computation 1 :
        Basic Algorithms and Operators", 2000.
     """
+    d = './Results/%s/bestind_%d_%d.txt' % (problem, num_p, n_corr)
+    ensure_dir(d)
+    best = open(d, 'w')  # save data
+
+    d = './Results/%s/bestind_string_%d_%d.txt' % (problem, num_p, n_corr)
+    ensure_dir(d)
+    best_st = open(d, 'w')
 
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
@@ -172,10 +185,6 @@ def neat_GP( population, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, 
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
-
-    # save data for the best individual
-    best = open('./Results/%s/bestind_%d_%d.txt'%(problem, num_p, n_corr), 'a')
-    best_st = open('./Results/%s/bestind_string_%d_%d.txt' % (problem, num_p, n_corr), 'a')
 
     #  take the best on the population
     best_ind = best_pop(population)

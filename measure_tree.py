@@ -36,7 +36,6 @@ def compare_tree(tree1, tree2):
 
     :param tree1: First Individual
     :param tree2: Second Individual
-    :param version: Original version or modify version.
     :return: a tuple with the number of nodes and the common depth
     """
     nodo = 0

@@ -106,8 +106,8 @@ def energy_coolng(n_corr, num_p, problem, name_database):
 
 def main(n_corr, num_p):
     problem = "EnergyCooling"
-    name_database="energy_efficiency_Cooling"
-    pop_size = 500
+    name_database = "energy_efficiency_Cooling"
+    pop_size = 100
 
     energy_coolng(n_corr, num_p, problem, name_database)
 
@@ -133,12 +133,13 @@ def main(n_corr, num_p):
     mutpb = 0.3
     ngen = 100
     params = ['best_of_each_specie', 2, 'yes']
-    neat_cx = False
-    neat_alg = False
+    neat_cx = True
+    neat_alg = True
     neat_pelit = 0.5
     neat_h = 0.15
+    neat_beta = 0.5
 
-    pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, num_p, params, problem, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = eaneatGP.neat_GP(pop, toolbox, cxpb, mutpb, ngen, neat_alg, neat_cx, neat_h, neat_pelit, n_corr, num_p, params, problem, neat_beta, stats=mstats, halloffame=hof, verbose=True)
     return pop, log, hof
 
 
@@ -152,7 +153,7 @@ def run(number, problem):
 if __name__ == "__main__":
     n_corr_min = 1
     n_corr_max = 2
-    num_p = 9
+    num_p = 101
     while n_corr_min <= n_corr_max:
         main(n_corr_min, num_p)
         n_corr_min += 1
