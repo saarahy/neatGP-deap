@@ -66,13 +66,12 @@ def compare_tree(tree1, tree2):
                     nivel_ant = ind1[1]-1
                     for elem in range(len(list_tree1)):
                         prev_node = ind1[0]-1
-                        level_= list_tree1[elem][0]
                         if list_tree1[elem][1] == nivel_ant and prev_node == list_tree1[elem][0]:
                             if list_tree2[elem][2] == list_tree1[elem][2]:
                                 total = list_tree2[elem][2]
-                                [list_tree2.append(x) for x in expr2 if (x[0] == list_tree2[elem][0] + 1 or x[0] == list_tree2[elem][0] + 2)]
-                                [list_tree1.append(x) for x in expr1 if
-                                 (x[0] == list_tree1[elem][0] + 1 or x[0] == list_tree1[elem][0] + 2)]
+                                for i in range(1, list_tree1[elem][2]+1):
+                                    [list_tree2.append(x) for x in expr2 if (x[0] == list_tree2[elem][0] + i)]
+                                    [list_tree1.append(x) for x in expr1 if (x[0] == list_tree1[elem][0] + i)]
                     nodo += total
                     if total > 0:
                         lista_nivel.append(ind1[1])
