@@ -22,6 +22,11 @@ There's a modification on measure_tree.py file on the compare tree method. The m
 By the way, we made a new version of the algorithm where we integrate a local search method into neat-GP, you can found it in https://github.com/saarahy/NGP-LS (Article: http://dl.acm.org/citation.cfm?id=2931659).
 </br>
 </br>
+# Instructions
+After the installation you only have to configure the parameters in the conf file (conf.yaml) and the run the MAIN_FILE.py.
+If you want to add or remove the primitives set you have to modify the conf_primitives.py file, also in this file you can check if the number of arguments that you are going to need is in dictionary of the rename_arguments method.
+</br>
+</br>
 And that's all. <br>
 If you have a problem please contact me: juarez.s.perla[at]gmail.com <br>
 Regards!
