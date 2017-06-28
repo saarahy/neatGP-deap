@@ -10,21 +10,36 @@ def protectedDiv(left, right):
     except ZeroDivisionError:
         return z
 
+
 def myexp(x):
-    with np.errstate(divide='ignore',invalid='ignore'):
+    with np.errstate(divide='ignore', invalid='ignore'):
         if isinstance(x, np.ndarray):
-            x[x>700]=700
             x = np.exp(x)
-            print x[np.isinf(x)]
-            x[np.isinf(x)] = 0.0
-            x[np.isnan(x)] = 0.0
+            x[np.isinf(x)] = np.exp(700)
+            x[np.isnan(x)] = np.exp(700)
+            return x
         else:
-            if x<700:
-                x=700
-            x=np.exp(x)
+            x = np.exp(x)
             if np.isinf(x):
-                x=0.0
-        return x
+                x = np.exp(700)
+            elif np.isnan(x):
+                x = np.exp(700)
+            return x
+
+def negexp(x):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        if isinstance(x, np.ndarray):
+            x = np.exp(np.negative(x))
+            x[np.isinf(x)] = np.exp(np.negative(700))
+            x[np.isnan(x)] = np.exp(np.negative(700))
+            return x
+        else:
+            x = np.exp(np.negative(x))
+            if np.isinf(x):
+                x = np.exp(np.negative(700))
+            elif np.isnan(x):
+                x = np.exp(np.negative(700))
+            return x
 
 
 def safe_div(left, right):
@@ -40,7 +55,7 @@ def safe_div(left, right):
 
 def mylog(x):
     with np.errstate(divide='ignore',invalid='ignore'):
-        if isinstance(x,np.ndarray):
+        if isinstance(x, np.ndarray):
             x=np.log10(abs(x))
             x[np.isinf(x)] = 0.
             x[np.isnan(x)] = 0.0
@@ -53,8 +68,8 @@ def mylog(x):
 
 
 def mysqrt(x):
-    if isinstance(x,np.ndarray):
-        x[x<=0.0]=0.0
+    if isinstance(x, np.ndarray):
+        x[x < 0.0] = 0.0
         return np.sqrt(x)
     else:
         if x <= 0.0:
@@ -86,7 +101,17 @@ def mypower3(x):
 
 
 def negative(x):
-    return -x
+    if isinstance(x, np.ndarray):
+        return np.negative(x)
+    else:
+        return -x
+
+
+def absolute(x):
+    if isinstance(x, np.ndarray):
+        return np.absolute(x)
+    else:
+        return abs(x)
 
 
 def undivide(x):
@@ -102,10 +127,13 @@ def undivide(x):
         else:
             return 1.0/x
 
+
 def avg_nodes(population):
-    n_nodes=[]
+    n_nodes = []
     for ind in population:
         n_nodes.append(len(ind))
-    nn_nodes=np.asarray(n_nodes)
-    av_size=np.mean(nn_nodes)
-    return av_size
+    nn_nodes = np.asarray(n_nodes)
+    max_size = max(nn_nodes)
+    min_size = min(nn_nodes)
+    av_size = np.mean(nn_nodes)
+    return av_size, max_size, min_size

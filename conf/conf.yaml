@@ -1,0 +1,26 @@
+benchmark: false
+problem: "Housing"
+num_var: 13
+n_problem: 2113
+db_name: "housing.txt"
+
+
+population_size: 100
+tournament_size: 7
+generations: 100
+cxpb: 0.9
+mutpb: 0.1
+params: ['best_of_each_specie', 2, 'yes']
+
+neat_cx: False
+neat_alg: True
+neat_pelit: 0.5
+neat_h: 0.15
+neat_beta: 0.5
+
+
+run_begin: 1
+run_end: 31
+
+
+
